@@ -4,7 +4,7 @@
      2013-04-20 olegyk added boot_clean, build, jar, run
      2009-10-12 olegyk Created
  -->
-<project name="GeomLab" default="build">
+<project name="EscherProg" default="build">
 	<property name="bin.dir" location="bin"/>
 	<property name="src.dir" location="src"/>
 	<property name="boot.dir" location="boot"/>
@@ -15,20 +15,20 @@
 	<!-- intermediate build products -->
 	<property name="script_class" value="geomlab.RunScript"/>
 
-	<path id="geomlab.classpath">
+	<path id="prog.classpath">
         <pathelement location="bin"/>
     </path>
 
-	<target name="GeomLab" description="Run GeomLab">
+	<target name="run" description="Run EscherProg">
         <java classname="geomlab.GeomLab" failonerror="true" fork="yes">
-            <classpath refid="geomlab.classpath"/>
+            <classpath refid="prog.classpath"/>
         </java>
     </target>
 	
-	<target name="clean-all" depends="jar_clean,boot_clean,clean" description="Clean GeomLab All"/>
+	<target name="clean-all" depends="clean-jar,clean-boot,clean" description="Clean EscherProg All"/>
 
-	<target name="boot_clean" description="Clean GeomLab Boot">
-		<echo message="Clean GeomLab Boot"/>
+	<target name="clean-boot" description="Clean EscherProg Boot">
+		<echo message="Clean EscherProg Boot"/>
 		<delete>
 			<fileset dir="${boot.dir}" includes="*.boot"/>
 			<!-- stage1, stage2, stage3 -->
@@ -39,9 +39,9 @@
 		</delete>
 	</target>
 
-	<target name="boot" depends="boot_clean" description="Create GeomLab Boot">
+	<target name="boot" depends="clean-boot" description="Create EscherProg Boot">
 		<!-- Use the bootstrap code to compile the compiler -->
-		<echo message="Create GeomLab Boot"/>
+		<echo message="Create EscherProg Boot"/>
 		<java classname="${script_class}" classpath="${bin.dir}" fork="false"
                 output="${boot.dir}/stage1.boot">
 			<arg value="-b"/>
@@ -74,7 +74,7 @@
 		<!-- move file="geomlab.gls" todir="${bin.dir}"/ -->
 	</target>
 
-    <target name="clean" description="Clean GeomLab Java Classes">
+    <target name="clean" description="Clean EscherProg Java Classes">
         <delete dir="bin"/>
     </target>
 
@@ -88,28 +88,28 @@
         </copy>
     </target>
 
-	<target name="build" depends="clean,init" description="Build GeomLab Java Classes">
+	<target name="build" depends="clean,init" description="Build EscherProg Java Classes">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="${bin.dir}" includeantruntime="false" 
         		source="${source}" target="${target}">
             <src path="${src.dir}"/>
-            <classpath refid="geomlab.classpath"/>
+            <classpath refid="prog.classpath"/>
         </javac>
     </target>
 
-	<target name="jar_clean" description="Clean GeomLab Jar">
+	<target name="clean-jar" description="Clean EscherProg Jar">
 		<echo message="Clean Jar"/>
 		<delete>
 			<fileset dir="." includes="*.jar"/>
 		</delete>
 	</target>
 
-	<target name="jar" depends="boot,jar_clean" description="Build GeomLab Jar">
-		<jar destfile="geomlab.jar" basedir="${bin.dir}" manifest="${bin.dir}/META-INF/MANIFEST.MF"/>
+	<target name="jar" depends="boot,clean-jar" description="Build EscherProg Jar">
+		<jar destfile="EscherProg.jar" basedir="${bin.dir}" manifest="${bin.dir}/META-INF/MANIFEST.MF"/>
 	</target>
 
-	<target name="GeomLabJar" description="Run GeomLab Jar">
-        <java jar="geomlab.jar" fork="true"/>
+	<target name="run-jar" description="Run EscherProg Jar">
+        <java jar="EscherProg.jar" fork="true"/>
     </target>
 	
 </project>
