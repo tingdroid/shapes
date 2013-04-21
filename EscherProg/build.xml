@@ -8,6 +8,7 @@
 	<property name="bin.dir" location="bin"/>
 	<property name="src.dir" location="src"/>
 	<property name="boot.dir" location="boot"/>
+	<property name="run.dir" location="run"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
@@ -100,16 +101,17 @@
 	<target name="clean-jar" description="Clean EscherProg Jar">
 		<echo message="Clean Jar"/>
 		<delete>
-			<fileset dir="." includes="*.jar"/>
+			<fileset dir="${run.dir}" includes="*.jar"/>
 		</delete>
 	</target>
 
 	<target name="jar" depends="boot,clean-jar" description="Build EscherProg Jar">
-		<jar destfile="EscherProg.jar" basedir="${bin.dir}" manifest="${bin.dir}/META-INF/MANIFEST.MF"/>
+		<jar destfile="${run.dir}/EscherProg.jar" basedir="${bin.dir}" 
+			manifest="${bin.dir}/META-INF/MANIFEST.MF"/>
 	</target>
 
 	<target name="run-jar" description="Run EscherProg Jar">
-        <java jar="EscherProg.jar" fork="true"/>
+        <java jar="${run.dir}/EscherProg.jar" fork="true"/>
     </target>
 	
 </project>
