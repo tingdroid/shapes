@@ -1,6 +1,33 @@
+# General
+*.bak
+*.pyc
+*.orig
+
+# Java class files
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# generated files
+bin/
+gen/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# allow Eclipse project files
+# .classpath
+# .project
+
+# Eclipse settings
+.settings/
+lint.xml
+
+# OS files
+.DS_Store
+
+# assets
+assets/
