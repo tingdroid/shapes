@@ -30,8 +30,11 @@
 
 package geomlab;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
+import javax.swing.JTextArea;
 
 /** Like JTextArea, but implements antialiasing */
 public class MyTextArea extends JTextArea {

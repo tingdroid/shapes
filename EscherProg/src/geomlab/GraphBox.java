@@ -30,15 +30,31 @@
 
 package geomlab;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.awt.print.*;
+import geomlab.Command.CommandException;
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
-import geomlab.Command.CommandException;
-import javax.swing.*;
-import javax.swing.event.*;
+
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /** A Frame for displaying a Picture object */
 public class GraphBox extends JFrame implements Printable {
@@ -217,6 +233,6 @@ public class GraphBox extends JFrame implements Printable {
     	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
     		RenderingHints.VALUE_ANTIALIAS_ON);
     	pic.draw(g2, width, height, background, slider);
-        javax.imageio.ImageIO.write(image, "png", file);
+        ImageIO.write(image, "png", file);
     }
 }   

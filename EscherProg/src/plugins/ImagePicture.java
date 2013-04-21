@@ -30,16 +30,23 @@
 
 package plugins;
 
-import java.awt.image.*;
-import java.io.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 
 import funbase.ErrContext;
 import funbase.Evaluator;
+import funbase.Evaluator.Continuation;
+import funbase.Evaluator.EvalException;
+import funbase.Evaluator.Result;
 import funbase.Primitive;
 import funbase.Value;
-import funbase.Evaluator.*;
 
 
 public class ImagePicture extends Picture {

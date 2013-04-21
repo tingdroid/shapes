@@ -30,7 +30,9 @@
 
 package geomlab;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 
 /** A non-editable text area that can be opened as a PrintWriter */
 public class LogArea extends MyTextArea {

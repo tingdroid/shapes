@@ -31,10 +31,15 @@
 package funbase;
 
 
-import java.io.*;
-import java.text.*;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
-import funbase.Evaluator.*;
+import funbase.Evaluator.Continuation;
+import funbase.Evaluator.EvalException;
+import funbase.Evaluator.Result;
 
 /** Abstract superclass of all values in GeomLab */
 public abstract class Value implements Serializable {

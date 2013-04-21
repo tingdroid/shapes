@@ -35,7 +35,17 @@ import funbase.Primitive;
 import funbase.Scanner;
 import geomlab.Command.CommandException;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -126,7 +136,7 @@ public class Session {
 	
 	Set<String> sessionPlugins = (Set<String>) in.readObject();
 	for (String x : sessionPlugins) {
-	    Class plugin = Class.forName(x);
+	    Class<?> plugin = Class.forName(x);
 	    installPlugin(plugin);
 	}
 	

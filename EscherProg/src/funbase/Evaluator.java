@@ -30,9 +30,9 @@
 
 package funbase;
 
-import funbase.Machine.ByteCode;
-
 import java.io.PrintWriter;
+
+import funbase.Machine.ByteCode;
 
 /** This class provides the context for evaluating paragraphs: it imposes
  *  a time limit, and provides the final continuations that are invoked

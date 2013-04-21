@@ -30,14 +30,14 @@
 
 package funbase;
 
-import static funbase.Scanner.Token.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+
+import funbase.Scanner.Token;
 
 /** Part of the process of building a working GeomLab system is to 
  *  input code for the compiler that was prepared using the previous
@@ -58,9 +58,9 @@ public class BootLoader {
 	scanner.scan();
 	
 	while (true) {
-	    String t = get(IDENT);
+	    String t = get(Token.IDENT);
 	    if (t.equals("global")) {
-		String x = get(STRING);
+		String x = get(Token.STRING);
 		Value v = value();
 		Name xx = Name.find(x);
 		xx.setGlodef(v, null);
@@ -74,22 +74,22 @@ public class BootLoader {
     
     /** Read a value from the bootfile */
     private Value value() {
-	String t = get(IDENT);
+	String t = get(Token.IDENT);
 	if (t.equals("boolean"))
 	    return Value.makeBoolValue(getInt() != 0);
 	else if (t.equals("name"))
-	    return Name.find(get(STRING));
+	    return Name.find(get(Token.STRING));
 	else if (t.equals("string"))
-	    return Value.makeStringValue(get(STRING));
+	    return Value.makeStringValue(get(Token.STRING));
 	else if (t.equals("integer"))
 	    return Value.makeNumValue(getInt());
 	else if (t.equals("primitive"))
-	    return Primitive.find(get(STRING));
+	    return Primitive.find(get(Token.STRING));
 	else if (t.equals("nil"))
 	    return Value.nil;
 	else if (t.equals("bytecode")) {
 	    /* Bytecode for a function. */
-	    String name = get(STRING);
+	    String name = get(Token.STRING);
 	    int arity = getInt();
 	    int fsize = getInt();
 	    int ssize = getInt();
@@ -126,11 +126,11 @@ public class BootLoader {
     /** Scan and return an integer */
     private int getInt() {
 	String s = "";
-	if (scanner.tok == MINUS) {
-	    scanner.eat(MINUS);
+	if (scanner.tok == Token.MINUS) {
+	    scanner.eat(Token.MINUS);
 	    s = "-";
 	}
-	s += get(NUMBER);
+	s += get(Token.NUMBER);
 	return Integer.parseInt(s);
     }
     

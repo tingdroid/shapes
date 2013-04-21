@@ -30,10 +30,12 @@
 
 package geomlab;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringReader;
+
 import funbase.BootLoader;
 import geomlab.Command.CommandException;
-
-import java.io.*;
 
 
 /** RunScript allows expressions to be evaluated from the command line, and

@@ -32,8 +32,13 @@ package plugins;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.Set;
 
 import funbase.Primitive;
 import funbase.Value;

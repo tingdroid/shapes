@@ -32,7 +32,9 @@ package funbase;
 
 import java.io.PrintWriter;
 
-import funbase.Evaluator.*;
+import funbase.Evaluator.Continuation;
+import funbase.Evaluator.EvalException;
+import funbase.Evaluator.Result;
 
 
 /** A value that represents a function.  Concrete subclasses are Closure,

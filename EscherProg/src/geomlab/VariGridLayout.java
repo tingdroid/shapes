@@ -29,7 +29,11 @@
  */
 
 package geomlab;
-import java.awt.*;
+
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 /** A layout manager that maintains a grid, but with variable
  * column widths and row heights.  Components must be added by

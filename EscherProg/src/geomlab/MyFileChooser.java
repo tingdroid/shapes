@@ -30,9 +30,10 @@
 
 package geomlab;
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
+import java.awt.Component;
+import java.io.File;
+
+import javax.swing.JFileChooser;
 
 /** A JFileChooser that remembers the directory between instances, and
  *  can filter by a default extension */

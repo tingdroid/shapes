@@ -30,8 +30,8 @@
 
 package plugins;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.util.Stack;
 
 import funbase.Primitive;
 import funbase.Value;

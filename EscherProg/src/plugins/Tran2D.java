@@ -30,7 +30,7 @@
 
 package plugins;
 
-import java.awt.geom.*;
+import java.awt.geom.AffineTransform;
 
 /** An affine transformation in 2D, represented by six real coefficients:
  *  [x'] = [m_xx  m_xy] [x] + [m_x]
@@ -68,7 +68,7 @@ public class Tran2D implements java.io.Serializable {
     
     /** Compose this transform (on the left) with another one on the right */
     public Tran2D concat(Tran2D t) {
-	Tran2D a = this;
+	// Tran2D a = this;
 	//  [ a_xx  a_xy  a_x ] [ b_xx  b_xy  b_x ]
 	//  [ a_yx  a_yy  a_y ] [ b_yx  b_yy  b_y ]
 	//  [  0     0     1  ] [  0     0     1  ]

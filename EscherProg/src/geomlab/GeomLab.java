@@ -30,15 +30,17 @@
 
 package geomlab;
 
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.StringReader;
+
+import javax.swing.JFrame;
+
 import funbase.Name;
 import funbase.Value;
 import geomlab.Command.CommandException;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.*;
-import java.io.*;
 
 /** The main appplication class for GeomLab.
  * 

@@ -30,7 +30,8 @@
 
 package geomlab;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 
 /** A dialog box showing the version number, credits and licence information */
 public class AboutBox {

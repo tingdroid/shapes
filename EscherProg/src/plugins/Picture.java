@@ -30,13 +30,17 @@
 
 package plugins;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import funbase.Evaluator;
 import funbase.Primitive;
 import funbase.Value;
 import geomlab.GraphBox;
 import geomlab.GraphBox.Drawable;
-import java.awt.*;
-import java.io.*;
 
 /* The pictures that GeomLab works with do not have a fixed size, but
  may be scaled uniformly to achieve any desired height or

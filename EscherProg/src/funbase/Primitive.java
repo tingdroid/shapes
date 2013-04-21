@@ -30,10 +30,16 @@
 
 package funbase;
 
-import java.util.*;
-import java.io.*;
+import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import funbase.Evaluator.*;
+import funbase.Evaluator.Continuation;
+import funbase.Evaluator.EvalException;
+import funbase.Evaluator.Result;
 
 /** A value that represents a primitive function like 'sqrt' or '+'. */
 public abstract class Primitive extends Function {

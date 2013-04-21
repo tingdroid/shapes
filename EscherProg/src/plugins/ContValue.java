@@ -34,10 +34,11 @@ import java.io.PrintWriter;
 
 import funbase.ErrContext;
 import funbase.Evaluator;
+import funbase.Evaluator.Continuation;
+import funbase.Evaluator.Result;
 import funbase.Function;
 import funbase.Primitive;
 import funbase.Value;
-import funbase.Evaluator.*;
 
 
 /** First-class continuations.

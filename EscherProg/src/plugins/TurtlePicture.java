@@ -30,7 +30,7 @@
 
 package plugins;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.PrintWriter;
 
 import funbase.Evaluator;

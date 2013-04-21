@@ -30,9 +30,9 @@
 
 package funbase;
 
-import java.io.*;
+import java.io.Reader;
+
 import funbase.Scanner.Token;
-import static funbase.Scanner.Token.*;
 
 /** Parser for the GeomLab language.  After parsing a paragraph with the
  *  parsePara method, you can fetch the text that has been parsed with
@@ -89,23 +89,23 @@ public class Parser {
     private Value p_para() {
 	Value p;
 	
-	if (scanner.tok == EOF)
+	if (scanner.tok == Token.EOF)
 	    return null;
 	
 	switch (scanner.tok) {
 	    case DEFINE:
-		scanner.eat(DEFINE);
+		scanner.eat(Token.DEFINE);
 		p = p_defn(true);
 		break;
 	    default:
 		p = p_expr();
 	}
 	
-	if (scanner.tok == RPAR)
+	if (scanner.tok == Token.RPAR)
 	    scanner.syntax_error("Can't find matching '('", "#parenmatch");
-	else if (scanner.tok == KET)
+	else if (scanner.tok == Token.KET)
 	    scanner.syntax_error("Can't find matching '['", "#bramatch");
-	else if (scanner.tok != SEMI && scanner.tok != EOF)
+	else if (scanner.tok != Token.SEMI && scanner.tok != Token.EOF)
 	    scanner.syntax_error(
 		    "extra text appears after the end of the expression",
 		    "#junk");
@@ -117,15 +117,15 @@ public class Parser {
     private Value p_expr() {
 	switch (scanner.tok) {
 	    case LET: {
-		scanner.eat(LET);
+		scanner.eat(Token.LET);
 		Value d = p_defn(false);
-		scanner.eat(IN);
+		scanner.eat(Token.IN);
 		Value e = p_expr();
 		return node(Name.LET, d, e);
 	    }
 
 	    case LAMBDA: {
-		scanner.eat(LAMBDA);
+		scanner.eat(Token.LAMBDA);
 		Value formals = p_formals();
 		int arity = nformals;
 		Value body = p_expr();
@@ -135,8 +135,8 @@ public class Parser {
 
 	    default: {
 		Value e = p_cond();
-		if (scanner.tok == SEQ) {
-		    scanner.eat(SEQ);
+		if (scanner.tok == Token.SEQ) {
+		    scanner.eat(Token.SEQ);
 		    e = node(Name.SEQ, e, p_expr());
 		}
 		return e;
@@ -148,16 +148,16 @@ public class Parser {
     private Value p_cond() {
 	switch (scanner.tok) {
 	case IF:
-	    scanner.eat(IF);
+	    scanner.eat(Token.IF);
 	    Value e1 = p_cond();
-	    scanner.eat(THEN);
+	    scanner.eat(Token.THEN);
 	    Value e2 = p_cond();
-	    scanner.eat(ELSE);
+	    scanner.eat(Token.ELSE);
 	    Value e3 = p_cond();
 	    return node(Name.IF, e1, e2, e3);
 
 	default:
-	    return p_term(minPriority);
+	    return p_term(Token.minPriority);
 	}
     }
     
@@ -181,7 +181,7 @@ public class Parser {
 	
 	for (;;) {
 	    Token tok = scanner.tok;
-	    if (tok.priority < min  || tok.priority > maxBinary) 
+	    if (tok.priority < min  || tok.priority > Token.maxBinary) 
 		return e1;
 	    String s = scanner.sym;
 	    scanner.eat(tok);
@@ -203,13 +203,13 @@ public class Parser {
     private Value p_factor() {
 	switch (scanner.tok) {
 	case MONOP:
-	    Value op = node(Name.VAR, p_sym(MONOP));
+	    Value op = node(Name.VAR, p_sym(Token.MONOP));
 	    return node(Name.APPLY, op, p_factor());
 	
 	case MINUS:
 	case UMINUS:
 	    scanner.scan();
-	    if (scanner.tok == NUMBER) {
+	    if (scanner.tok == Token.NUMBER) {
 		double val = p_number();
 		return node(Name.CONST, Value.makeNumValue(-val));
 	    }
@@ -230,36 +230,36 @@ public class Parser {
 	    return node(Name.CONST, Value.makeNumValue(p_number()));
 	    
 	case ATOM:
-	    return node(Name.CONST, p_sym(ATOM));
+	    return node(Name.CONST, p_sym(Token.ATOM));
 	
 	case IDENT:
 	case OP:
 	    Value e1 = node(Name.VAR, p_name());
-	    if (scanner.tok != LPAR) 
+	    if (scanner.tok != Token.LPAR) 
 	    	return e1;
 	    else {
-		scanner.eat(LPAR);
-		Value args = p_exprs(RPAR);
-		scanner.eat(RPAR);
+		scanner.eat(Token.LPAR);
+		Value args = p_exprs(Token.RPAR);
+		scanner.eat(Token.RPAR);
 		return Value.cons(Name.find("apply"), 
 			Value.cons(e1, args));
 	    }
 
 	case STRING:
 	    String text = scanner.sym;
-	    scanner.eat(STRING);
+	    scanner.eat(Token.STRING);
 	    return node(Name.CONST, Value.makeStringValue(text));
 
 	case LPAR:
-	    scanner.eat(LPAR);
+	    scanner.eat(Token.LPAR);
 	    Value e = p_expr();
-	    scanner.eat(RPAR);
+	    scanner.eat(Token.RPAR);
 	    return e;
 	
 	case BRA:
-	    scanner.eat(BRA);
-	    Value elements = p_exprs(KET);
-	    scanner.eat(KET);
+	    scanner.eat(Token.BRA);
+	    Value elements = p_exprs(Token.KET);
+	    scanner.eat(Token.KET);
 	    return Value.cons(Name.find("list"), elements);
 
 	case EOF:
@@ -284,7 +284,7 @@ public class Parser {
 		break;
 		   
 	    case OP:
-		scanner.eat(OP);
+		scanner.eat(Token.OP);
 		if (scanner.tok.priority <= 0) {
 		    scanner.syntax_error("I expected an operator symbol here",
 					 "#op");
@@ -292,7 +292,7 @@ public class Parser {
 		break;
 
 	    default:
-		scanner.eat(IDENT);
+		scanner.eat(Token.IDENT);
 		return null;
 	}
 		
@@ -317,9 +317,9 @@ public class Parser {
 	    scanner.syntax_error("can't replace built-in definition of '" + 
 		    x + "'", "#redef");
 	
-	if (scanner.tok != LPAR) {
+	if (scanner.tok != Token.LPAR) {
 	    // A simple value definition
-	    scanner.eat(EQUAL);
+	    scanner.eat(Token.EQUAL);
 	    return node(Name.VAL, x, p_expr());
 	}
 	
@@ -329,11 +329,11 @@ public class Parser {
 	int arity = nformals;
 
 	for (;;) {
-	    scanner.eat(EQUAL);
+	    scanner.eat(Token.EQUAL);
 	    Value e = p_expr();
 	    Value rule;
-	    if (scanner.tok == WHEN) {
-	        scanner.eat(WHEN);
+	    if (scanner.tok == Token.WHEN) {
+	        scanner.eat(Token.WHEN);
 	        Value g = p_expr();
 	        rule = Value.makeList(fps, g, e);
 	    }
@@ -341,9 +341,10 @@ public class Parser {
 		rule = Value.makeList(fps, e);
 	    rules = Value.cons(rule, rules);
 	    
-	    if (scanner.tok != VBAR) break;
-	    scanner.eat(VBAR);
+	    if (scanner.tok != Token.VBAR) break;
+	    scanner.eat(Token.VBAR);
 	    
+	    @SuppressWarnings("unused")
 	    Name y = p_name(x);
 	    fps = p_formals();
 	    if (nformals != arity) 
@@ -358,9 +359,9 @@ public class Parser {
     
     // formals ::= '(' [ pattern {',' pattern} ] ')'
     private Value p_formals() {
-	scanner.eat(LPAR);
-	Value s = p_patterns(RPAR);
-	scanner.eat(RPAR);
+	scanner.eat(Token.LPAR);
+	Value s = p_patterns(Token.RPAR);
+	scanner.eat(Token.RPAR);
 	return s;
     }
     
@@ -372,8 +373,8 @@ public class Parser {
 	
 	if (scanner.tok != end_tok) {
 	    v = Value.cons(p_pattern(), v); n = 1;
-	    while (scanner.tok == COMMA) {
-		scanner.eat(COMMA);
+	    while (scanner.tok == Token.COMMA) {
+		scanner.eat(Token.COMMA);
 		v = Value.cons(p_pattern(), v); n++;
 	    }
 	}
@@ -385,8 +386,8 @@ public class Parser {
     // pattern ::= patfactor { '+' NUMBER }
     private Value p_pattern() {
 	Value p = p_patfactor();
-	while (scanner.tok == PLUS) {
-	    scanner.eat(PLUS);
+	while (scanner.tok == Token.PLUS) {
+	    scanner.eat(Token.PLUS);
 	    p = node(Name.PLUS, p, Value.makeNumValue(p_number()));
 	}
 	return p;
@@ -395,8 +396,8 @@ public class Parser {
     // patfactor ::= patprim { ':' patfactor }
     private Value p_patfactor() {
 	Value p = p_patprim();
-	if (scanner.tok == CONS) {
-	    Name op = p_sym(CONS);
+	if (scanner.tok == Token.CONS) {
+	    Name op = p_sym(Token.CONS);
 	    p = node(Name.PRIM, op, p, p_patfactor());
 	}
 	return p;
@@ -407,21 +408,21 @@ public class Parser {
 	case IDENT:
 	case OP:
 	    Name x = p_name();
-	    if (scanner.tok != LPAR)
+	    if (scanner.tok != Token.LPAR)
 		return node(Name.VAR, x);
 	    else {
-		scanner.eat(LPAR);
-		Value args = p_patterns(RPAR);
-		scanner.eat(RPAR);
+		scanner.eat(Token.LPAR);
+		Value args = p_patterns(Token.RPAR);
+		scanner.eat(Token.RPAR);
 		return Value.cons(Name.find("prim"), 
 			Value.cons(x, args));
 	    }
 	    
 	case ATOM:
-	    return node(Name.CONST, p_sym(ATOM));
+	    return node(Name.CONST, p_sym(Token.ATOM));
 
 	case ANON:
-	    scanner.eat(ANON);
+	    scanner.eat(Token.ANON);
 	    return node(Name.ANON);
 
 	case NUMBER:
@@ -431,19 +432,19 @@ public class Parser {
 
 	case STRING:
 	    String text = scanner.sym;
-	    scanner.eat(STRING);
+	    scanner.eat(Token.STRING);
 	    return node(Name.CONST, Value.makeStringValue(text));
 
 	case LPAR:
-	    scanner.eat(LPAR);
+	    scanner.eat(Token.LPAR);
 	    Value p1 = p_pattern();
-	    scanner.eat(RPAR);
+	    scanner.eat(Token.RPAR);
 	    return p1;
 
 	case BRA:
-	    scanner.eat(BRA);
-	    Value elems = p_patterns(KET);
-	    scanner.eat(KET);
+	    scanner.eat(Token.BRA);
+	    Value elems = p_patterns(Token.KET);
+	    scanner.eat(Token.KET);
 	    return Value.cons(Name.find("list"), elems);
 
 	default:
@@ -456,10 +457,10 @@ public class Parser {
     private Value p_exprs(Token end_tok) {
 	Value v = Value.nil;
 	
-	if (scanner.tok != end_tok && scanner.tok != EOF) {
+	if (scanner.tok != end_tok && scanner.tok != Token.EOF) {
 	    v = Value.cons(p_expr(), v);
-	    while (scanner.tok == COMMA) {
-		scanner.eat(COMMA);
+	    while (scanner.tok == Token.COMMA) {
+		scanner.eat(Token.COMMA);
 		v = Value.cons(p_expr(), v);
 	    }
 	}
@@ -469,12 +470,12 @@ public class Parser {
     
     private double p_number() {
 	double x = 0.0; boolean negate = false;
-	if (scanner.tok == MINUS || scanner.tok == UMINUS) {
+	if (scanner.tok == Token.MINUS || scanner.tok == Token.UMINUS) {
 	    negate = true; scanner.scan();
 	}
-	if (scanner.tok == NUMBER) 
+	if (scanner.tok == Token.NUMBER) 
 	    x = Double.parseDouble(scanner.sym);
-	scanner.eat(NUMBER);
+	scanner.eat(Token.NUMBER);
 	return (negate ? -x : x);
     }
     

@@ -30,8 +30,15 @@
 
 package funbase;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Names in the Fun program are represented by unique Name objects.
  *  These contain a shallow binding to their value in the global
@@ -131,7 +138,7 @@ public class Name extends Value
     @SuppressWarnings("unchecked")
     public static void readNameTable(ObjectInputStream in) 
     		throws IOException, ClassNotFoundException {
-	nameTable = (Map) in.readObject();
+	nameTable = (Map<String,Name>) in.readObject();
 	setNames();
     }
 

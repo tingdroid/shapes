@@ -30,9 +30,12 @@
 
 package funbase;
 
-import java.io.*;
-import java.util.*;
-import static funbase.Scanner.Token.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Scanner {
     private static final String svnid =
@@ -110,39 +113,39 @@ public class Scanner {
     
     // Fill in the keyword table with all reserved words
     static {
-	kwtable.put("if", IF);
-	kwtable.put("then", THEN);
-	kwtable.put("else", ELSE);
-	kwtable.put("let", LET);
-	kwtable.put("define", DEFINE);
-	kwtable.put("in", IN);
-	kwtable.put("lambda", LAMBDA);
-	kwtable.put("when", WHEN);
-	kwtable.put("op", OP);
-	kwtable.put("_", ANON);
+	kwtable.put("if", Token.IF);
+	kwtable.put("then", Token.THEN);
+	kwtable.put("else", Token.ELSE);
+	kwtable.put("let", Token.LET);
+	kwtable.put("define", Token.DEFINE);
+	kwtable.put("in", Token.IN);
+	kwtable.put("lambda", Token.LAMBDA);
+	kwtable.put("when", Token.WHEN);
+	kwtable.put("op", Token.OP);
+	kwtable.put("_", Token.ANON);
 	
-	kwtable.put("div", MULOP);
-	kwtable.put("mod", MULOP);
-	kwtable.put("and", AND);
-	kwtable.put("or", OR);
-	kwtable.put("not", MONOP);
+	kwtable.put("div", Token.MULOP);
+	kwtable.put("mod", Token.MULOP);
+	kwtable.put("and", Token.AND);
+	kwtable.put("or", Token.OR);
+	kwtable.put("not", Token.MONOP);
 
-	kwtable.put("=", EQUAL);
-	kwtable.put("+", PLUS);
-	kwtable.put("-", MINUS);
-	kwtable.put("$", MULOP);
-	kwtable.put("*", MULOP);
-	kwtable.put("/", MULOP);
-	kwtable.put("&", ADDOP);
-	kwtable.put("~", UMINUS);
-	kwtable.put(":", CONS);
-	kwtable.put("@", APPOP);
-	kwtable.put("<", RELOP);
-	kwtable.put("<=", RELOP);
-	kwtable.put("<>", RELOP);
-	kwtable.put(">", RELOP);
-	kwtable.put(">=", RELOP);
-	kwtable.put(">>", SEQ);
+	kwtable.put("=", Token.EQUAL);
+	kwtable.put("+", Token.PLUS);
+	kwtable.put("-", Token.MINUS);
+	kwtable.put("$", Token.MULOP);
+	kwtable.put("*", Token.MULOP);
+	kwtable.put("/", Token.MULOP);
+	kwtable.put("&", Token.ADDOP);
+	kwtable.put("~", Token.UMINUS);
+	kwtable.put(":", Token.CONS);
+	kwtable.put("@", Token.APPOP);
+	kwtable.put("<", Token.RELOP);
+	kwtable.put("<=", Token.RELOP);
+	kwtable.put("<>", Token.RELOP);
+	kwtable.put(">", Token.RELOP);
+	kwtable.put(">=", Token.RELOP);
+	kwtable.put(">>", Token.SEQ);
     }
     
     public static void addOperator(String symbol, Token token) {
@@ -163,7 +166,7 @@ public class Scanner {
     @SuppressWarnings("unchecked")
     public static void readSyntax(ObjectInputStream in) 
     		throws IOException, ClassNotFoundException {
-	kwtable = (Map) in.readObject();
+	kwtable = (Map<String, Token>) in.readObject();
     }
     
     public static void writeSyntax(ObjectOutputStream out)
@@ -183,7 +186,7 @@ public class Scanner {
 	while (tok == null) {
 	    switch (ch) {
 		case '\0': // EOF
-		    tok = EOF; break;
+		    tok = Token.EOF; break;
 		case ' ':
 		case '\t':
 		case '\r':
@@ -206,7 +209,7 @@ public class Scanner {
 			else if (ch == '\n')
 			    line_num++;
 			else if (ch == '\0') {
-			    start_char = char_num; tok = EOF;
+			    start_char = char_num; tok = Token.EOF;
 			    syntax_error("unterminated comment", "#comment");
 			}
 			
@@ -215,23 +218,23 @@ public class Scanner {
 		    break; 
 		}
 		case '}':
-		    tok = RBRACE;
+		    tok = Token.RBRACE;
 		    syntax_error("Can't find matching '{'", "#bracematch");
 		    break;
 		case '(':
-		    tok = LPAR; break;
+		    tok = Token.LPAR; break;
 		case ')': 
-		    tok = RPAR; break;
+		    tok = Token.RPAR; break;
 		case '[':
-		    tok = BRA; break;
+		    tok = Token.BRA; break;
 		case ']':
-		    tok = KET; break;
+		    tok = Token.KET; break;
 		case ',': 
-		    tok = COMMA; break;
+		    tok = Token.COMMA; break;
 		case ';':
-		    tok = SEMI; break;
+		    tok = Token.SEMI; break;
 		case '|':
-		    tok = VBAR; break;
+		    tok = Token.VBAR; break;
 		    
 		case '"': {
 		    StringBuilder string = new StringBuilder(80);
@@ -240,13 +243,13 @@ public class Scanner {
 			string.append(ch); ch = getChar();
 		    }
 		    if (ch == '"') {
-			tok = STRING;
+			tok = Token.STRING;
 			sym = string.toString();
 		    }
 		    else {
 			pushBack(ch);
 			start_char = char_num;
-			tok = (ch == '\n' ? EOL : EOF);
+			tok = (ch == '\n' ? Token.EOL : Token.EOF);
 			syntax_error("unterminated string constant", "#string");
 		    }
 		    break;
@@ -260,7 +263,7 @@ public class Scanner {
 		    }
 		    pushBack(ch);
 		    sym = buf.toString();
-		    tok = ATOM;
+		    tok = Token.ATOM;
 		    break;
 		}
 		
@@ -274,11 +277,11 @@ public class Scanner {
 			pushBack(ch);
 			sym = buf.toString();
 			tok = kwtable.get(sym);
-			if (tok == null) tok = IDENT;
+			if (tok == null) tok = Token.IDENT;
 		    } else if (Character.isDigit(ch)) {
 			// A numeric constant
 			StringBuilder buf = new StringBuilder(10);
-			tok = NUMBER; 
+			tok = Token.NUMBER; 
 			while (Character.isDigit(ch)) {
 			    buf.append(ch); ch = getChar();
 			}
@@ -329,7 +332,7 @@ public class Scanner {
     }
 
     private void badToken() {
-	tok = BADTOK;
+	tok = Token.BADTOK;
 	syntax_error("unknown symbol", "#badtok");
     }
     
@@ -344,8 +347,8 @@ public class Scanner {
     /** Report a syntax error at the current token */
     void syntax_error(String msg, String errtag) {
 	String chars = 
-	    (tok == EOF ? "end of input" :
-		tok == EOL ? "end of line" :
+	    (tok == Token.EOF ? "end of input" :
+		tok == Token.EOL ? "end of line" :
 		"'" + text.substring(start_char - root_char) + "'");
 	throw new SyntaxException(msg, line_num, start_char, char_num, 
 		chars, errtag);
