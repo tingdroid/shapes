@@ -1,0 +1,367 @@
+{*
+ * prelude.txt
+ * 
+ * This file is part of GeomLab
+ * Copyright (c) 2005 J. M. Spivey
+ * All rights reserved
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.      
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
+ *    and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products 
+ *    derived from this software without specific prior written permission.
+ *    
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR 
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *}
+ 
+{ RE-INSTALL THE COMPILER }
+
+define _top = _compiler();
+
+ 
+{ INSTALL LOADABLE MODULES }
+
+define _install = _primitive("install");
+define _freeze = _primitive("freeze");
+define _error = _primitive("error");
+define _opdef = _primitive("opdef");
+define _load = _primitive("load");
+define _limit = _primitive("limit");
+define _dump = _primitive("dump");
+define quit = _primitive("quit");
+
+_install("BasicPrims");
+define op = = _primitive("=");
+define op <> = _primitive("<>");
+define op + = _primitive("+");
+define op - = _primitive("-");
+define op * = _primitive("*");
+define op / = _primitive("/");
+define op ~ = _primitive("~");
+define op < = _primitive("<");
+define op <= = _primitive("<=");
+define op > = _primitive(">");
+define op >= = _primitive(">=");
+define numeric = _primitive("numeric");
+define int = _primitive("int");
+define sqrt = _primitive("sqrt");
+define sin = _primitive("sin");
+define cos = _primitive("cos");
+define tan = _primitive("tan");
+define random = _primitive("random");
+define head = _primitive("head");
+define tail = _primitive("tail");
+define op : = _primitive(":");
+
+_install("StringPrims");
+_opdef("^", "+");
+define op ^ = _primitive("^");
+define explode = _primitive("explode");
+define implode = _primitive("implode");
+
+_install("Picture");
+define _null = _primitive("null");
+define op $ = _primitive("$");
+define op & = _primitive("&");
+define rot = _primitive("rot");
+define flip = _primitive("flip");
+define colour = _primitive("colour");
+define stretch = _primitive("stretch");
+define aspect = _primitive("aspect");
+define _palette = _primitive("palette");
+
+_install("TilePicture");
+define _tile = _primitive("tile");
+
+_install("ColorValue");
+define rgb = _primitive("rgb");
+define hsv = _primitive("hsv");
+define rpart(rgb(r, g, b)) = r;
+define gpart(rgb(r, g, b)) = g;
+define bpart(rgb(r, g, b)) = b;
+
+_install("TurtlePicture");
+define turtle = _primitive("turtle");
+define left = _primitive("left");
+define right = _primitive("right");
+define ahead = _primitive("ahead");
+
+_install("BushPicture");
+define bush = _primitive("bush");
+define _bushparams = _primitive("bushparams");
+
+
+{ BASIC DEFINITIONS }
+
+define true = numeric(0);
+define false = numeric(true);
+
+define op not (p) = false when p = true
+  | op not (p) = true when p = false
+  | op not (_) = _error("not expects a boolean operand", "#not");
+
+define op div (x, y) = int(x/y);
+define op mod (x, y) = x - y * int(x/y);
+
+define op @ ([], ys) = ys 
+  | op @ (x:xs, ys) = x:(xs @ ys)
+  | op @ (_, _) = _error("bad arguments to operator '@'", "#concat");
+
+define reverse(xs) =
+  let reva([], vs) = vs 
+    | reva(x:us, vs) = reva(us, x:vs) 
+    | reva(_, _) = _error("bad argument to function 'reverse'", "#reverse") in
+  reva(xs, []);
+
+define length([]) = 0 
+  | length(x:xs) = length(xs)+1
+  | length(_) = _error("bad argument to function 'length'", "#length");
+
+define assoc(x, []) = [] 
+  | assoc(x, [u,v]:zs) = 
+      if x = u then v else assoc(x, zs);
+      
+define map(f, []) = [] | map(f, x:xs) = f(x) : map(f, xs);
+
+define member(x, []) = false | member(x, y:ys) = x = y or member(x, ys);
+
+define index(x, xs) = 
+  let h(n, []) = -1 | h(n, y:ys) = if x = y then n else h(n+1, ys) in
+  h(0, xs);
+
+define foldr(f, a, []) = a | foldr(f, a, x:xs) = f(x, foldr(f, a, xs));
+
+define foldl(f, a, []) = a | foldl(f, a, x:xs) = foldl(f, f(a, x), xs);
+
+define opp(left(a)) = right(a)
+  | opp(right(a)) = left(a)
+  | opp(ahead(a)) = ahead(a)
+  | opp(_) = _error("'opp' expects a command argument", "#type");
+
+define opposite(xs) = map(opp, xs);
+
+
+{ COMMON PICTURE FUNCTIONS }
+
+define _blank(r) = _tile(r, 1, 0, 0, [], []);
+
+define blank = _blank(1);
+define null = _null();
+
+define solid(r, c) = 
+  _tile(r, 1, 0, 0, [], [[c, 0,0, r,0, r,1, 0,1]]);
+
+
+{ BASIC TILES }
+
+define _stick(w, h, x, y, col, outline) =
+    _tile(w, h, x, y, [outline], [col:outline]);
+    
+define man = 
+    _stick(12, 22, -1, -1, rgb(0.85, 0.85, 1.0),
+        [4,2, 6,2, 7,6, 8,2, 10,2, 8,10, 8,12, 12,12, 12,16,
+            10,16, 10,14, 8,14, 8,16, 10,18, 10,20, 8,22, 6,22,
+            4,20, 4,18, 6,16, 6,14, 2,14, 2,12, 6,12, 6,10, 4,2]);
+            
+define woman =
+    _stick(12, 22, -1, -1, rgb(1.0, 0.85, 0.85),
+	[4,2, 6,2, 6,4, 8,4, 8,2, 10,2, 10,4, 12,4,
+	    8,12, 12,10, 12,12, 8,14, 8,16, 10,18, 10,20, 8,22, 6,22,
+	    4,20, 4,18, 6,16, 6,14, 2,12, 2,10, 6,12, 2,4, 4,4, 4,2]);
+
+define tree =
+    _stick(12, 22, -1, -1, rgb(0.85, 1.0, 0.85),
+	[7,22, 10,16, 8,16, 11,10, 9,10, 12,4, 8,4, 8,2, 6,2, 6,4, 
+	    2,4, 5,10, 3,10, 6,16, 4,16, 7,22]);
+
+define star =
+    let r = cos(72)/cos(36) { Radius of inner pentagon } in
+    rot(_stick(2.2, 2.2, 1.1, 1.1, rgb(1.0, 1.0, 0.7),
+	[1,0, r*cos(36),r*sin(36), cos(72),sin(72),
+	    r*cos(108),r*sin(108), cos(144),sin(144), 
+	    r*cos(180),r*sin(180), cos(216),sin(216), 
+	    r*cos(252),r*sin(252), cos(288),sin(288),
+	    r*cos(324),r*sin(324), 1,0]));
+
+{ We rotate Henderson's tiles to simplify the presentation;
+   consequently, tiles 1, 2, 3, 4 become C, A, D, B }
+   
+define C =
+    rot(_tile(16, 16, 0, 0,
+        [[11,0, 8,8, 7,11, 5,13, 0,16],		{ Top of large body }
+            [0,4, 0,8, 3,5, 0,4],               { Left eye }
+            [4,6, 4,10, 7,7, 4,6],              { Right eye }
+            [4,4, 6,0],                         { Median }
+            [0,16, 4,15, 6,15, 8,16, 8,14, 12,12, 16,12], 
+						{ Top of small body }
+            [8,8, 10,10, 16,8],                 { Bottom of small body }
+            [8,12, 16,10],                      { Median }
+            [10,6, 13,9],                       { Right wing ribs }
+            [11,3, 16,8],
+            [12,0, 16,4],
+            [10,13, 10,16],                     { Spare ribs }
+            [12,12, 12,16],
+            [14,12, 14,16]], 
+        [[0, 0,0, 16,0, 16,8, 10,10, 8,8, 7,11, 5,13, 0,16],
+            [3, 16,8, 10,10, 8,8, 7,11, 5,13, 0,16, 4,15, 6,15, 8,16, 
+                8,14, 12,12, 16,12],
+            [1, 0,16, 4,15, 6,15, 8,16],
+            [1, 16,12, 12,12, 8,14, 8,16, 16,16]]));
+    
+define A =
+    rot(_tile(16, 16, 0, 0,
+        [[0,16, 0,12, 8,16],                    { Top of upper body }
+            [0,0, 0,8, 5,7, 8,8, 11,9, 13,11, 16,16],
+						{ Bottom of upper body }
+            [8,0, 10,6, 8,8],                   { Left side of lower body }
+            [12,0, 12,4, 14,8, 16,8, 15,10, 15,12, 16,16],  
+						{ Right side of lower body }
+            [8,15, 11,15, 9,13, 8,15],          { Left eye }
+            [9,12, 12,12, 10,10, 9,12],         { Right eye }
+            [0,10, 8,12],                       { Upper median }
+            [10,0, 12,8],                       { Lower median }
+            [2,0, 2,6],                         { Upper right ribs }
+            [4,0, 4,6],
+            [6,0, 6,6],
+            [2,14, 2,16],                       { Upper left ribs }
+            [4,15, 4,16],
+            [12,2, 16,2],                       { Spare ribs }
+            [12,4, 16,4],
+            [13,6, 16,6]], 
+        [[3, 0,0, 0,16, 16,16, 13,11, 11,9, 8,8, 10,6, 8,0],
+            [2, 8,0, 10,6, 8,8, 11,9, 13,11, 16,16, 15,12, 15,10, 
+                16,8, 14,8, 12,4, 12,0],
+            [0, 16,16, 15,12, 15,10, 16,8],
+            [0, 16,8, 14,8, 12,4, 12,0, 16,0]]));
+    
+define D =
+    rot(_tile(16, 16, 0, 0,
+        [[0,16, 2,12, 8,8, 16,4, 16,0],         { Bottom of body }
+            [11,16, 12,12, 16,8],               { Top of body }
+            [6,16, 10,10, 16,6],                { Median }
+            [0,0, 8,8],                         { Left wing }
+            [12,12, 16,16],                     { Right wing }
+            [0,8, 2,10],                        { Left wing ribs }
+            [0,4, 4,8],                       
+            [2,2, 4,0],                         { Spare ribs 1 }
+            [4,4, 8,0],
+            [6,6, 12,0],
+            [14,10, 16,10],                     { Spare ribs 2 }
+            [12,12, 16,12],
+            [14,14, 16,14]], 
+        [[0, 0,0, 0,16, 16,16, 12,12, 16,8, 16,4, 8,8],
+            [2, 16,8, 12,12, 16,16],
+            [3, 0,0, 8,8, 16,4, 16,0]]));
+
+define B =
+    rot(_tile(16, 16, 0, 0,
+        [[0,0, 4,2, 8,2, 16,0],                 { Bottom of large body }
+            [16,0, 11,3, 9,5, 8,8, 6,6, 0,8],   { Top of large body }
+            [8,8, 7,11, 8,16, 0,16],            { Left side of small body }
+            [16,8, 12,16, 16,16],               { Right side }
+            [10,6, 12,4, 12,7, 10,6],           { Right eye }
+            [13,7, 15,5, 15,8, 13,7],           { Left eye }
+            [12,8, 10,16],                      { Small median }
+            [4,4, 0,6],                         { Large median }
+            [0,10, 6,10],                       { Left wing ribs }
+            [0,12, 6,12],
+            [0,14, 6,14],
+            [14,14, 16,14],                     { Right wing ribs }
+            [15,12, 16,12]], 
+        [[2, 0,16, 0,8, 6,6, 8,8, 9,5, 11,3, 16,0, 16,16],
+            [0, 0,8, 6,6, 8,8, 9,5, 11,3, 16,0, 8,2, 4,2, 0,0],
+            [3, 0,0, 4,2, 8,2, 16,0]]));
+
+define E =
+    _tile(16, 16, 0, 0,
+        [[11,0, 8,8, 7,11, 5,13, 0,16],         { Top of large body }
+            [0,4, 0,8, 3,5, 0,4],               { Left eye }
+            [4,6, 4,10, 7,7, 4,6],              { Right eye }
+            [4,4, 6,0],                         { Median }
+            [8,8, 10,10, 16,8],                 { Bottom of small body }
+            [0,16, 8,14, 12,14, 16,16],         { Top of small body }
+            [10,6, 13,9],                       { Right wing ribs }
+            [11,3, 16,8],
+            [12,0, 16,4]],
+        [[0, 0,0, 16,0, 16,8, 10,10, 8,8, 7,11, 5,13, 0,16],
+            [2, 16,8, 10,10, 8,8, 7,11, 5,13, 0,16, 8,14, 12,14, 16,16],
+            [1, 0,16, 8,14, 12,14, 16,16]]);   
+            
+define F =
+    rot(rot(_tile(16, 16, 0, 0,
+        [[0,16, 2,12, 8,8, 16,4, 16,0],         { Bottom of body }
+            [11,16, 12,12, 16,8],               { Top of body }
+            [6,16, 10,10, 16,6],                { Median }
+            [0,0, 8,8],                         { Left wing }
+            [12,12, 16,16],                     { Right wing }
+            [0,8, 2,10],                        { Left wing ribs }
+            [0,4, 4,8],                       
+            [2,2, 4,0],                         { Spare ribs 1 }
+            [4,4, 8,0],
+            [6,6, 12,0],
+            [14,10, 16,12]],                    { Spare ribs 2 }
+        [[0, 0,0, 0,16, 16,16, 12,12, 16,8, 16,4, 8,8],
+            [2, 16,8, 12,12, 16,16],
+            [3, 0,0, 8,8, 16,4, 16,0]])));                   
+
+define _close(path) = path @ [head(path), head(tail(path))];
+
+define bend =
+    let p = [2,0.8, 1.2,0.8, 1.2,0, 0.8,0, 0.8,1.2, 2,1.2] in
+    _tile(2, 2, 0, 0, [_close(p)], [rgb(0,0,0):p]);
+
+define straight = 
+    let p = [0,0.8, 2,0.8, 2,1.2, 0,1.2] in
+    _tile(2, 2, 0, 0, [_close(p)], [rgb(0,0,0):p]);
+
+define nub = 
+    let c = 0.2 in
+    let a = c*tan(22.5) in 
+    let b = c*sqrt(2) in
+    let p = [2-c,0, 2-c,1-a, 1-b,2, 2,3+b, 3+a,2+c, 4,2+c,
+		  4,2-c, 3-a,2-c, 2,3-b, 1+b,2, 2+c,1+a, 2+c,0] in
+    _tile(4, 4, 0, 0, [_close(p)], [rgb(0,0,0):p]);
+
+define link = 
+    let c = 0.2 in
+    let a = c*tan(22.5) in 
+    let b = c*sqrt(2) in
+    let p = [2-c,0, 2-c,1-a, 1-a,2-c, 0,2-c, 0,2+c, 1+a,2+c, 2+c,1+a, 2+c,0] in
+    let q = [2+c,4, 2+c,3+a, 3+a,2+c, 4,2+c, 4,2-c, 3-a,2-c, 2-c,3-a, 2-c,4] in
+    _tile(4, 4, 0, 0, [_close(p), _close(q)], [rgb(0,0,0):p, rgb(0,0,0):q]);
+    
+define expand(f, x0, 0) = x0 
+  | expand(f, x0, n+1) = expand(f, implode(map(f, explode(x0))), n);
+
+{ Freeze all definitions made so far }
+_freeze();
+
+
+{ COMMON DEFINITIONS (to save typing them in each session) }
+
+define rot2(p) = rot(rot(p));
+define rot3(p) = rot(rot(rot(p)));
+
+define cycle(p) = (p $ rot3(p)) & (rot(p) $ rot2(p));
+
+define T = (A $ B) & (C $ D);
+define U = (A $ rot3(A)) & (rot(A) $ rot2(A));
+
+define frame(c, s, p) =
+    (c      $ rot3(s) $ rot3(c))
+  & (s      $ p       $ rot2(s))
+  & (rot(c) $ rot(s)  $ rot2(c));

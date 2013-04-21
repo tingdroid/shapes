@@ -1,0 +1,354 @@
+{*
+ * compiler.txt
+ * 
+ * This file is part of GeomLab
+ * Copyright (c) 2008 J. M. Spivey
+ * All rights reserved
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.      
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
+ *    and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products 
+ *    derived from this software without specific prior written permission.
+ *    
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR 
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *}
+ 
+{ At this point, the following plugins have been installed: GeomBase,
+  BasicPrims, Assembler, Cell.  Next come the primitives that are used
+  by the compiler; these are already there as part of the bootstrap process,
+  but we include them for completeness. }
+
+define op + = _primitive("+");
+define op - = _primitive("-");
+define op * = _primitive("*");
+define op / = _primitive("/");
+define op ~ = _primitive("~");
+
+define op < = _primitive("<");
+define op <= = _primitive("<=");
+define op <> = _primitive("<>");
+define op = = _primitive("=");
+define op > = _primitive(">");
+define op >= = _primitive(">=");
+
+define numeric = _primitive("numeric");
+define int = _primitive("int");
+define op : = _primitive(":");
+define head = _primitive("head");
+define tail = _primitive("tail");
+
+
+{ BASIC DEFINITIONS }
+
+{ Some of these are redefined in the prelude with better error handling. }
+
+define true = numeric(0);
+define false = numeric(true);
+
+define op not (p) = if p then false else true;
+
+define op @ ([], ys) = ys 
+  | op @ (x:xs, ys) = x:(xs @ ys);
+
+define reverse(xs) =
+  let reva([], vs) = vs 
+    | reva(x:us, vs) = reva(us, x:vs) in
+  reva(xs, []);
+
+define length([]) = 0 
+  | length(x:xs) = length(xs)+1;
+
+define assoc(x, []) = [] 
+  | assoc(x, [u,v]:zs) = if x = u then v else assoc(x, zs);
+      
+define map(f, []) = [] | map(f, x:xs) = f(x) : map(f, xs);
+
+define filter(p, []) = [] 
+  | filter(p, x:xs) = if p(x) then x:filter(p, xs) else filter(p, xs);
+
+define member(x, []) = false | member(x, y:ys) = x = y or member(x, ys);
+
+define index(x, xs) = 
+  let h(n, []) = -1 | h(n, y:ys) = if x = y then n else h(n+1, ys) in
+  h(0, xs);
+
+define foldr(f, a, []) = a | foldr(f, a, x:xs) = f(x, foldr(f, a, xs));
+
+
+{ THE COMPILER }
+
+{ All definitions that are specific to the compiler are made local to it:
+  this avoids 'polluting the name space' and makes bootstrapping easier.
+  But the bootstrap loader does not support closures that have free variables,
+  so here we create a function of no arguments that has no free variables,
+  and when it is called builds a network of closures and returns the main
+  compiling function.  Later (at the start of the prelude) we can call the
+  no-argument function one last time and save the resulting closure. }
+
+define _compiler() =
+  let new = _primitive("new") in
+  let get = _primitive("!") in
+  let set = _primitive(":=")  in
+
+  let assemble = _primitive("assemble") in
+
+  { Opcodes for assembler }
+  let GLOBAL = 1 in let LOCAL = 2 in let ARG = 3 in let FVAR = 4 in
+  let BIND = 5 in let POP = 6 in let CONST = 7 in let INT = 8 in 
+  let LIST = 9 in let CLOSURE = 10 in let TRAP = 11 in let GUARD = 12 in
+  let JFALSE = 13 in let JUMP = 14 in let CALL = 15 in let TCALL = 16 in 
+  let RETURN = 17 in let MCONST = 18 in let MINT = 19 in 
+  let MPLUS = 20 in let MEQ = 21 in let MLIST = 22 in let MPRIM = 23 in 
+  let TOPVAL = 24 in let TOPDEF = 25 in
+
+  let labcount = new(0) in
+
+  let label() = set(labcount, get(labcount)+1) in
+
+  { The compiler puts together the object code as a tree, with instructions
+    as the leaves, and internal nodes marked with #seq that signify
+    concatenation of their children.  The function flatten makes the tree
+    into a list in linear time. }
+  
+  { flatten -- arrange instuction tree into a list }
+  let flatten(c) =
+    let flat([], a) = a
+      | flat(#seq:cs, a) = foldr(flat, a, cs)
+      | flat(c, a) = c:a in
+    flat(c, []) in
+  
+  { body -- append RETURN instuction if needed }
+  let body(tail, code) =
+    if tail then [#seq, code, [RETURN]] else code in
+
+  { integer -- test if value is an integer }
+  let integer(v) = numeric(v) and v = int(v) in
+
+  { An environment is a 4-list [lev, dict, fvs, size], where
+
+      lev is the integer level.
+      dict is a cell containing an a-list of variables,
+        each mapped to information needed to load it.  The triple
+	[n, i, a] represents a definition at level n that requires
+	the instruction [i, a] to load it.
+      fvs is a cell containing a list of free variables that will be 
+        present in the closure
+      size is a cell containing the current frame size
+
+    For an inner function, fvs includes the name of the function as its
+    first element.  Each closure has itself as the first free variable
+    as a way of implementing local recursion. }
+
+  { c_ref -- compile a variable reference }
+  let c_ref(x, [lev, dict, fvs, _]) = 
+    let case([n, i, a]) = 
+    	  { x is a local or integer constant }
+          [i, a] when n = lev or i = INT
+      | case([_, _, _]) =
+          { x is local to an enclosing scope -- make it a free variable }
+          let a = length(get(fvs)) in
+          set(dict, [x, [lev, FVAR, a+1]] : get(dict)) >> 
+          set(fvs, get(fvs) @ [x]) >> 
+          [FVAR, a+1]
+      | case([]) = 
+          { x is not bound at all -- treat it as global }
+	  [GLOBAL, x] in
+    case(assoc(x, get(dict))) in
+
+  { empty -- initial environment }
+  let empty() = [0, new([]), new([]), new(0)] in
+
+  { alloc -- allocate space in frame }
+  let alloc(x, [lev, dict, _, size]) =
+    let a = get(size) in
+    set(dict, [x, [lev, LOCAL, a]] : get(dict)) >>
+    set(size, a+1) >> a in
+
+  { bind -- define name as local variable }
+  let bind(x, i, a, [lev, dict, _, _]) =
+    set(dict, [x, [lev, i, a]] : get(dict)) in
+
+  { islocal -- test if name is a local variable }
+  let islocal(x, [lev, dict, _, _]) = 
+    let case([n, i, _]) = (n = lev) when i = LOCAL or i = ARG
+      | case(_) = false in
+    case(assoc(x, get(dict))) in
+
+  { reset -- delete local variables at end of clause }
+  let reset([lev, dict, _, size]) =
+    let h([_, [n, i, _]]) = (n < lev) when i = LOCAL or i = ARG
+      | h(_) = true in
+    set(dict, filter(h, get(dict))) >> set(size, 0) in
+
+  { popdef -- discard most recent local variable }
+  let popdef(x, [_, dict, _, size]) =
+    let h([y, _] : d) = d when x = y
+      | h(v : d) = v : h(d)
+      | h([]) = [] in
+    set(dict, h(get(dict))) >> set(size, get(size)-1) in
+
+  { fvars -- get list of free variables }
+  let fvars([_, _, fvs, _]) = get(fvs) in
+
+  { newblock -- create new block for nested function }
+  let newblock(f, [lev, dict, _, _]) =
+    [lev+1, new([f, [lev+1, FVAR, 0]]:get(dict)), new([]), new(0)] in
+
+  { c_patt -- compile a pattern }
+  let c_patt([#const, v], env) = [MCONST, v]
+    | c_patt([#var, x], env) =
+        if islocal(x, env) then
+          [#seq, c_ref(x, env), [MEQ]]
+        else
+          [BIND, alloc(x, env)]
+    | c_patt([#anon], env) = [POP]
+    | c_patt(#prim:f:args, env) =
+        [#seq, c_ref(f, env), [MPRIM, length(args)],
+          #seq:map(lambda (p) c_patt(p, env), reverse(args))]
+    | c_patt(#list:elems, env) =
+        [#seq, [MLIST, length(elems)],
+          #seq:map(lambda (p) c_patt(p, env), reverse(elems))] 
+    | c_patt([#plus, p1, n], env) =
+        [#seq, [MPLUS, n], c_patt(p1, env)] in
+
+  { c_arg -- compile code to match an argument }
+  let c_arg([#var, x], i, env) =
+        { variable matches whole argument }
+        bind(x, ARG, i, env) >> [] when not islocal(x, env)
+    | c_arg([#anon], i, env) = []
+    | c_arg(p, i, env) =
+        [#seq, [ARG, i], c_patt(p, env)] in
+
+  { c_match -- compile code to match a list of arguments }
+  let c_match([], _, env) = []
+    | c_match(p:ps, i, env) =
+        [#seq, c_arg(p, i, env), c_match(ps, i+1, env)] in
+
+  { The functions c_rule and c_body are mutually recursive with c_exp.
+    Since our language does not support mutual recursion for local
+    functions, we fake it by tying the knot with a reference cell. }
+
+  let knot = new(0) in
+
+  { c_rule -- compile code for one rule in a function }
+  let c_rule([patts, body], env) =
+        let c_exp = get(knot) in
+        let match = c_match(patts, 0, env) in
+        let eval = c_exp(body, env, true) in
+        reset(env) >>
+        [#seq, match, eval]
+    | c_rule([patts, guard, body], env) =
+        let c_exp = get(knot) in
+        let match = c_match(patts, 0, env) in
+        let test = c_exp(guard, env, false) in
+        let eval = c_exp(body, env, true) in
+        reset(env) >>
+        [#seq, match, test, [GUARD], eval] in
+
+  { c_body -- compile code for a function body }
+  let c_body([r], env) = c_rule(r, env)
+    | c_body(r:rs, env) =
+        let fail = label() in
+        [#seq, [TRAP, fail], c_rule(r, env), fail, c_body(rs, env)] in
+
+  { c_exp -- compile code for an expression }
+  let c_exp([#const, v], env, tail) = 
+        { Integer constant }
+        body(tail, [INT, v]) when integer(v)
+    | c_exp([#const, v], env, tail) = 
+        { Constant expression }
+        body(tail, [CONST, v])
+    | c_exp([#var, x], env, tail) = 
+        { Variable reference }
+    	body(tail, c_ref(x, env))
+    | c_exp(#apply:f:args, env, tail) = 
+        { Function application  f(e1, ..., en) }
+        [#seq, #seq:map(lambda (e) c_exp(e, env, false), args), 
+          c_exp(f, env, false), 
+          [if tail then TCALL else CALL, length(args)]]
+    | c_exp([#if, e1, e2, e3], env, tail) =
+        { Conditional  if e1 then e2 else e3 }
+        let l1 = label() in let l2 = label() in
+        [#seq, c_exp(e1, env, false), [JFALSE, l1],
+          c_exp(e2, env, tail), if not tail then [JUMP, l2] else [],
+          l1, c_exp(e3, env, tail), l2]
+    | c_exp([#let, [#val, x, [#const, v]], e2], env, tail) =
+        { Special case: treat integer constants by substituting them }
+        bind(x, INT, v, env) >>
+        let c2 = c_exp(e2, env, tail) in
+        popdef(x, env) >> c2 when integer(v)
+    | c_exp([#let, [#val, x, e1], e2], env, tail) =
+        { Local value definition  let x = e1 in e2 }
+        let c1 = c_exp(e1, env, false) in
+        let a = alloc(x, env) in
+        let c2 = c_exp(e2, env, tail) in
+        popdef(x, env) >> 
+        [#seq, c1, [BIND, a], c2]
+    | c_exp([#let, (#fun:f:n:body), e2], env, tail) =
+        { Local function definition }
+        let env1 = newblock(f, env) in
+        let code = c_body(body, env1) in
+        let fvs = fvars(env1) in
+        let a = alloc(f, env) in
+        let c2 = c_exp(e2, env, tail) in
+        popdef(f, env) >>
+        [#seq, [CONST, assemble(f, n, flatten(code))],
+          #seq:map(lambda (x) c_ref(x, env), fvs),
+          [CLOSURE, length(fvs)], [BIND, a], c2]
+    | c_exp(#lambda:n:rule, env, tail) =
+        let env1 = newblock([], env) in
+        let code = c_rule(rule, env1) in
+        let fvs = fvars(env1) in
+        body(tail, 
+          [#seq, [CONST, assemble("<lambda>", n, flatten(code))],
+            #seq:map(lambda (x) c_ref(x, env), fvs),
+            [CLOSURE, length(fvs)]])
+    | c_exp(#list:es, env, tail) =
+        { A list expression [ e1, e2, ..., en ] }
+        body(tail, 
+          [#seq, #seq:map(lambda (e) c_exp(e, env, false), es), 
+            [LIST, length(es)]])
+    | c_exp([#seq, e1, e2], env, tail) =
+        { Sequential composition e1 >> e2 }
+        [#seq, c_exp(e1, env, false), [POP], c_exp(e2, env, tail)] in
+
+  let compile([#val, x, e]) = 
+        { A global value definition }
+        [#seq, c_exp(e, empty(), false), [TOPDEF, x]]
+    | compile(#fun:f:n:rules) = 
+        { A global function definition }
+        let body = c_body(rules, empty()) in
+        let code = assemble(f, n, flatten(body)) in 
+        [#seq, [CONST, code], [CLOSURE, 0], [TOPDEF, f]]
+    | compile(exp) = 
+        { A top-level expression }
+        [#seq, c_exp(exp, empty(), false), [TOPVAL]] in
+
+set(knot, c_exp) >>
+
+lambda (exp)
+  set(labcount, 0) >>
+  let code = compile(exp) in 
+  assemble("<top>", 0, flatten(code));
+  
+define _top(exp) =
+  let c = _compiler() in c(exp);
+  
+{ After bootstrapping, redefine _top = compiler() for efficiency }
+
+let h = _primitive("xdump") in h();

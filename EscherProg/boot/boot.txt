@@ -1,0 +1,426 @@
+{*
+ * boot.boot
+ * 
+ * This file is part of GeomLab
+ * Copyright (c) 2008 J. M. Spivey
+ * All rights reserved
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.      
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
+ *    and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products 
+ *    derived from this software without specific prior written permission.
+ *    
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR 
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *}
+ 
+global "*" primitive "*"
+global "+" primitive "+"
+global "-" primitive "-"
+global "/" primitive "/"
+global ":" primitive ":"
+global "<" primitive "<"
+global "<=" primitive "<="
+global "<>" primitive "<>"
+global "=" primitive "="
+global ">" primitive ">"
+global ">=" primitive ">="
+global "@" closure bytecode "@" 2 2 4 17 2
+ 11 5 3 0 22 0 3 1 17 0 3 0 1 0 23 2 5 0 5 1
+ 2 1 2 0 3 1 1 1 15 2 1 0 16 2
+name ":"
+name "@"
+{ end of @ }
+global "_compiler" closure bytecode "_compiler" 0 26 14 146 26
+ 7 0 1 1 15 1 5 0 7 2 1 1 15 1 5 1 7 3 1 1
+ 15 1 5 2 7 4 1 1 15 1 5 3 8 0 2 0 15 1 5 4
+ 7 5 2 4 2 1 2 2 10 3 5 5 7 6 10 0 5 6 7 7
+ 10 0 5 7 7 8 10 0 5 8 7 9 2 1 2 2 10 2 5 9
+ 7 10 2 0 10 1 5 10 7 11 2 1 2 2 10 2 5 11 7 12
+ 2 1 2 2 10 2 5 12 7 13 2 1 10 1 5 13 7 14 2 1
+ 2 2 10 2 5 14 7 15 2 1 2 2 10 2 5 15 7 16 2 1
+ 10 1 5 16 7 17 2 1 2 0 10 2 5 17 7 18 2 13 2 9
+ 2 11 10 3 5 18 7 19 2 13 2 12 2 18 10 3 5 19 7 20
+ 2 19 10 1 5 20 8 0 2 0 15 1 5 21 7 21 2 21 2 1
+ 2 20 2 14 10 4 5 22 7 22 2 22 2 5 10 2 5 23 7 23
+ 2 8 2 7 2 9 2 5 2 12 2 15 2 11 2 17 2 23 2 16
+ 2 6 2 3 2 22 10 13 5 24 7 24 2 10 2 24 2 23 2 6
+ 2 3 10 5 5 25 2 21 2 24 2 2 15 2 6 0 7 25 2 4
+ 2 2 2 25 2 6 2 3 10 5 17 0
+string "new"
+name "_primitive"
+string "!"
+string ":="
+string "assemble"
+bytecode "label" 0 0 4 9 1
+ 4 1 4 1 4 2 15 1 8 1 1 0 15 2 4 3 16 2
+name "+"
+{ end of label }
+bytecode "flatten" 1 1 3 7 1
+ 7 0 10 0 5 0 3 0 9 0 2 0 16 2
+bytecode "flat" 2 1 4 20 3
+ 11 5 3 0 22 0 3 1 17 0 11 16 3 0 1 0 23 2 5 0
+ 18 1 4 0 3 1 2 0 1 2 16 3 3 0 3 1 1 0 16 2
+name ":"
+name "seq"
+name "foldr"
+{ end of flat }
+{ end of flatten }
+bytecode "body" 2 0 3 10 1
+ 3 0 13 8 7 0 3 1 8 17 9 1 9 3 17 0 3 1 17 0
+name "seq"
+{ end of body }
+bytecode "integer" 1 0 3 12 4
+ 3 0 1 0 15 1 13 10 3 0 3 0 1 1 15 1 1 2 16 2
+ 7 3 17 0
+name "numeric"
+name "int"
+name "="
+boolean 0
+{ end of integer }
+bytecode "c_ref" 2 4 7 23 2
+ 3 1 22 4 6 0 5 0 5 1 5 2 7 0 2 2 2 0 4 1
+ 2 1 3 0 4 2 10 6 5 3 3 0 2 1 4 1 15 1 1 1
+ 15 2 2 3 16 1
+bytecode "case" 1 3 7 76 6
+ 11 22 3 0 22 3 5 0 5 1 5 2 2 2 4 1 1 0 15 2
+ 13 13 7 1 14 17 2 1 8 8 1 0 15 2 12 0 2 1 2 0
+ 9 2 17 0 11 70 3 0 22 3 6 0 6 0 6 0 4 2 4 3
+ 15 1 1 2 15 1 5 0 4 4 4 5 4 1 8 4 2 0 8 1
+ 1 3 15 2 9 3 9 2 4 4 4 3 15 1 1 4 15 2 4 6
+ 15 2 6 0 4 2 4 2 4 3 15 1 4 5 9 1 1 5 15 2
+ 4 6 15 2 6 0 8 4 2 0 8 1 1 3 15 2 9 2 17 0
+ 3 0 22 0 8 1 4 5 9 2 17 0
+name "="
+boolean 1
+name "length"
+name "+"
+name ":"
+name "@"
+{ end of case }
+name "assoc"
+{ end of c_ref }
+bytecode "empty" 0 0 5 12 0
+ 8 0 9 0 4 1 15 1 9 0 4 1 15 1 8 0 4 1 15 1
+ 9 4 17 0
+{ end of empty }
+bytecode "alloc" 2 4 5 35 2
+ 3 1 22 4 5 0 6 0 5 1 5 2 2 0 4 1 15 1 5 3
+ 2 1 3 0 2 2 8 2 2 3 9 3 9 2 2 1 4 1 15 1
+ 1 0 15 2 4 2 15 2 6 0 2 0 2 3 8 1 1 1 15 2
+ 4 2 15 2 6 0 2 3 17 0
+name ":"
+name "+"
+{ end of alloc }
+bytecode "bind" 4 2 5 20 1
+ 3 3 22 4 6 0 6 0 5 0 5 1 2 0 3 0 2 1 3 1
+ 3 2 9 3 9 2 2 0 4 1 15 1 1 0 15 2 4 2 16 2
+name ":"
+{ end of bind }
+bytecode "islocal" 2 3 4 18 2
+ 3 1 22 4 6 0 6 0 5 0 5 1 7 0 2 1 10 1 5 2
+ 3 0 2 0 4 1 15 1 1 1 15 2 2 2 16 1
+bytecode "case" 1 2 3 24 3
+ 11 22 3 0 22 3 6 0 5 0 5 1 2 0 8 2 1 0 15 2
+ 13 13 7 1 14 17 2 0 8 3 1 0 15 2 12 0 2 1 4 1
+ 1 0 16 2 1 2 17 0
+name "="
+boolean 1
+name "false"
+{ end of case }
+name "assoc"
+{ end of islocal }
+bytecode "reset" 1 4 4 24 2
+ 3 0 22 4 5 0 6 0 5 1 5 2 7 0 2 2 10 1 5 3
+ 2 1 2 3 2 1 4 1 15 1 1 1 15 2 4 2 15 2 6 0
+ 2 0 8 0 4 2 16 2
+bytecode "h" 1 2 4 26 4
+ 11 24 3 0 22 2 22 3 6 0 5 0 5 1 6 0 2 0 8 2
+ 1 0 15 2 13 15 7 1 14 19 2 0 8 3 1 0 15 2 12 0
+ 2 1 4 1 1 2 16 2 1 3 17 0
+name "="
+boolean 1
+name "<"
+name "true"
+{ end of h }
+name "filter"
+{ end of reset }
+bytecode "popdef" 2 3 4 28 2
+ 3 1 22 4 5 0 6 0 5 1 6 0 7 0 3 0 10 1 5 2
+ 2 1 2 1 4 1 15 1 2 2 15 1 4 2 15 2 6 0 2 0
+ 2 0 4 1 15 1 8 1 1 1 15 2 4 2 16 2
+bytecode "h" 1 2 3 31 2
+ 11 15 3 0 1 0 23 2 5 0 22 2 6 0 5 1 4 1 2 1
+ 1 1 15 2 12 0 2 0 17 0 11 27 3 0 1 0 23 2 5 0
+ 5 1 2 1 2 0 4 0 15 1 1 0 16 2 3 0 22 0 9 0
+ 17 0
+name ":"
+name "="
+{ end of h }
+name "-"
+{ end of popdef }
+bytecode "fvars" 1 1 4 9 0
+ 3 0 22 4 6 0 5 0 6 0 6 0 2 0 4 1 16 1
+{ end of fvars }
+bytecode "newblock" 2 2 5 34 2
+ 3 1 22 4 6 0 6 0 5 0 5 1 2 1 8 1 1 0 15 2
+ 3 0 2 1 8 1 1 0 15 2 8 4 8 0 9 3 9 2 2 0
+ 4 1 15 1 1 1 15 2 4 2 15 1 9 0 4 2 15 1 8 0
+ 4 2 15 1 9 4 17 0
+name "+"
+name ":"
+{ end of newblock }
+bytecode "c_patt" 2 2 7 116 13
+ 11 9 3 0 22 2 5 0 18 0 8 18 2 0 9 2 17 0 11 35
+ 3 0 22 2 5 0 18 1 2 0 3 1 4 1 15 2 13 28 7 2
+ 2 0 3 1 4 2 15 2 8 21 9 1 9 3 17 0 8 5 2 0
+ 3 1 4 3 15 2 9 2 17 0 11 42 3 0 22 1 18 3 8 6
+ 9 1 17 0 11 75 3 0 1 4 23 2 1 4 23 2 5 0 5 1
+ 18 5 7 2 2 1 3 1 4 2 15 2 8 23 2 0 1 6 15 1
+ 9 2 7 2 7 7 3 1 4 0 10 2 2 0 1 8 15 1 1 9
+ 15 2 1 4 15 2 9 4 17 0 11 101 3 0 1 4 23 2 5 0
+ 18 10 7 2 8 22 2 0 1 6 15 1 9 2 7 2 7 11 3 1
+ 4 0 10 2 2 0 1 8 15 1 1 9 15 2 1 4 15 2 9 3
+ 17 0 3 0 22 3 5 0 5 1 18 12 7 2 8 20 2 0 9 2
+ 2 1 3 1 4 0 15 2 9 3 17 0
+name "const"
+name "var"
+name "seq"
+name "anon"
+name ":"
+name "prim"
+name "length"
+bytecode "<lambda>" 1 0 3 4 0
+ 3 0 4 1 4 2 16 2
+{ end of <lambda> }
+name "reverse"
+name "map"
+name "list"
+bytecode "<lambda>" 1 0 3 4 0
+ 3 0 4 1 4 2 16 2
+{ end of <lambda> }
+name "plus"
+{ end of c_patt }
+bytecode "c_arg" 3 1 5 37 4
+ 11 21 3 0 22 2 5 0 18 0 2 0 3 2 4 1 15 2 1 1
+ 15 1 12 0 2 0 8 3 3 1 3 2 4 2 15 4 6 0 9 0
+ 17 0 11 27 3 0 22 1 18 2 9 0 17 0 7 3 8 3 3 1
+ 9 2 3 0 3 2 4 3 15 2 9 3 17 0
+name "var"
+name "not"
+name "anon"
+name "seq"
+{ end of c_arg }
+bytecode "c_match" 3 2 6 26 3
+ 11 5 3 0 22 0 9 0 17 0 3 0 1 0 23 2 5 0 5 1
+ 7 1 2 1 3 1 3 2 4 1 15 3 2 0 3 1 8 1 1 2
+ 15 2 3 2 4 0 15 3 9 3 17 0
+name ":"
+name "seq"
+name "+"
+{ end of c_match }
+bytecode "c_rule" 2 7 5 69 3
+ 11 30 3 0 22 2 5 0 5 1 4 1 4 2 15 1 5 2 2 1
+ 8 0 3 1 4 3 15 3 5 3 2 0 3 1 1 0 2 2 15 3
+ 5 4 3 1 4 4 15 1 6 0 7 1 2 3 2 4 9 3 17 0
+ 3 0 22 3 5 0 5 1 5 2 4 1 4 2 15 1 5 3 2 2
+ 8 0 3 1 4 3 15 3 5 4 2 1 3 1 1 2 2 3 15 3
+ 5 5 2 0 3 1 1 0 2 3 15 3 5 6 3 1 4 4 15 1
+ 6 0 7 1 2 4 2 5 8 12 9 1 2 6 9 5 17 0
+name "true"
+name "seq"
+name "false"
+{ end of c_rule }
+bytecode "c_body" 2 3 7 31 2
+ 11 8 3 0 22 1 5 0 2 0 3 1 4 1 16 2 3 0 1 0
+ 23 2 5 0 5 1 4 2 15 0 5 2 7 1 8 11 2 2 9 2
+ 2 1 3 1 4 1 15 2 2 2 2 0 3 1 4 0 15 2 9 5
+ 17 0
+name ":"
+name "seq"
+{ end of c_body }
+bytecode "c_exp" 3 9 10 367 20
+ 11 15 3 0 22 2 5 0 18 0 2 0 4 1 15 1 12 0 3 2
+ 8 8 2 0 9 2 4 2 16 2 11 26 3 0 22 2 5 0 18 0
+ 3 2 8 7 2 0 9 2 4 2 16 2 11 38 3 0 22 2 5 0
+ 18 1 3 2 2 0 3 1 4 3 15 2 4 2 16 2 11 74 3 0
+ 1 2 23 2 1 2 23 2 5 0 5 1 18 3 7 4 7 4 7 5
+ 3 1 4 0 10 2 2 0 1 6 15 2 1 2 15 2 2 1 3 1
+ 1 7 4 0 15 3 3 2 13 67 8 16 14 68 8 15 2 0 1 8
+ 15 1 9 2 9 4 17 0 11 119 3 0 22 4 5 0 5 1 5 2
+ 18 9 4 4 15 0 5 3 4 4 15 0 5 4 7 4 2 2 3 1
+ 1 7 4 0 15 3 8 13 2 3 9 2 2 1 3 1 3 2 4 0
+ 15 3 3 2 1 10 15 1 13 109 8 14 2 4 9 2 14 110 9 0
+ 2 3 2 0 3 1 3 2 4 0 15 3 2 4 9 8 17 0 11 154
+ 3 0 22 3 5 0 22 3 22 2 5 1 18 0 5 2 18 11 18 12
+ 2 1 4 1 15 1 12 0 2 2 8 8 2 1 3 1 4 5 15 4
+ 6 0 2 0 3 1 3 2 4 0 15 3 5 3 2 2 3 1 4 6
+ 15 2 6 0 2 3 17 0 11 193 3 0 22 3 5 0 22 3 5 1
+ 5 2 18 11 18 12 2 1 3 1 1 7 4 0 15 3 5 3 2 2
+ 3 1 4 7 15 2 5 4 2 0 3 1 3 2 4 0 15 3 5 5
+ 2 2 3 1 4 6 15 2 6 0 7 4 2 3 8 5 2 4 9 2
+ 2 5 9 4 17 0 11 269 3 0 22 3 5 0 1 2 23 2 1 2
+ 23 2 1 2 23 2 5 1 5 2 5 3 18 13 18 12 2 3 3 1
+ 4 8 15 2 5 4 2 1 2 4 4 9 15 2 5 5 2 4 4 10
+ 15 1 5 6 2 3 3 1 4 7 15 2 5 7 2 0 3 1 3 2
+ 4 0 15 3 5 8 2 3 3 1 4 6 15 2 6 0 7 4 8 7
+ 2 3 2 2 2 5 4 11 15 1 4 12 15 3 9 2 7 4 7 14
+ 3 1 4 3 10 2 2 6 1 6 15 2 1 2 15 2 8 10 2 6
+ 1 8 15 1 9 2 8 5 2 7 9 2 2 8 9 6 17 0 11 321
+ 3 0 1 2 23 2 1 2 23 2 5 0 5 1 18 15 9 0 3 1
+ 4 8 15 2 5 2 2 0 2 2 4 13 15 2 5 3 2 2 4 10
+ 15 1 5 4 3 2 7 4 8 7 7 16 2 1 2 3 4 11 15 1
+ 4 12 15 3 9 2 7 4 7 17 3 1 4 3 10 2 2 4 1 6
+ 15 2 1 2 15 2 8 10 2 4 1 8 15 1 9 2 9 4 4 2
+ 16 2 11 347 3 0 1 2 23 2 5 0 18 18 3 2 7 4 7 4
+ 7 19 3 1 4 0 10 2 2 0 1 6 15 2 1 2 15 2 8 9
+ 2 0 1 8 15 1 9 2 9 3 4 2 16 2 3 0 22 3 5 0
+ 5 1 18 4 7 4 2 1 3 1 1 7 4 0 15 3 8 6 9 1
+ 2 0 3 1 3 2 4 0 15 3 9 4 17 0
+name "const"
+name "var"
+name ":"
+name "apply"
+name "seq"
+bytecode "<lambda>" 1 0 4 5 1
+ 3 0 4 1 1 0 4 2 16 3
+name "false"
+{ end of <lambda> }
+name "map"
+name "false"
+name "length"
+name "if"
+name "not"
+name "val"
+name "let"
+name "fun"
+bytecode "<lambda>" 1 0 3 4 0
+ 3 0 4 1 4 2 16 2
+{ end of <lambda> }
+name "lambda"
+string "<lambda>"
+bytecode "<lambda>" 1 0 3 4 0
+ 3 0 4 1 4 2 16 2
+{ end of <lambda> }
+name "list"
+bytecode "<lambda>" 1 0 4 5 1
+ 3 0 4 1 1 0 4 2 16 3
+name "false"
+{ end of <lambda> }
+{ end of c_exp }
+bytecode "compile" 1 5 5 67 5
+ 11 18 3 0 22 3 5 0 5 1 18 0 7 1 2 0 4 1 15 0
+ 1 2 4 2 15 3 8 25 2 1 9 2 9 3 17 0 11 56 3 0
+ 1 3 23 2 1 3 23 2 1 3 23 2 5 0 5 1 5 2 18 4
+ 2 0 4 1 15 0 4 3 15 2 5 3 2 2 2 1 2 3 4 4
+ 15 1 4 5 15 3 5 4 7 1 8 7 2 4 9 2 8 10 8 0
+ 9 2 8 25 2 2 9 2 9 4 17 0 7 1 3 0 4 1 15 0
+ 1 2 4 2 15 3 8 24 9 1 9 3 17 0
+name "val"
+name "seq"
+name "false"
+name ":"
+name "fun"
+{ end of compile }
+bytecode "<lambda>" 1 1 4 16 1
+ 4 1 8 0 4 2 15 2 6 0 3 0 4 3 15 1 5 0 7 0
+ 8 0 2 0 4 4 15 1 4 5 16 3
+string "<top>"
+{ end of <lambda> }
+{ end of _compiler }
+global "_primitive" primitive "primitive"
+global "_top" closure bytecode "_top" 1 1 2 6 1
+ 1 0 15 0 5 0 3 0 2 0 16 1
+name "_compiler"
+{ end of _top }
+global "assoc" closure bytecode "assoc" 2 3 3 23 3
+ 11 5 3 1 22 0 9 0 17 0 3 1 1 0 23 2 5 0 22 2
+ 5 1 5 2 3 0 2 2 1 1 15 2 13 19 2 1 17 0 3 0
+ 2 0 1 2 16 2
+name ":"
+name "="
+name "assoc"
+{ end of assoc }
+global "false" boolean 0
+global "filter" closure bytecode "filter" 2 2 4 25 2
+ 11 5 3 1 22 0 9 0 17 0 3 1 1 0 23 2 5 0 5 1
+ 2 1 3 0 15 1 13 21 2 1 3 0 2 0 1 1 15 2 1 0
+ 16 2 3 0 2 0 1 1 16 2
+name ":"
+name "filter"
+{ end of filter }
+global "foldr" closure bytecode "foldr" 3 2 5 18 2
+ 11 5 3 2 22 0 3 1 17 0 3 2 1 0 23 2 5 0 5 1
+ 2 1 3 0 3 1 2 0 1 1 15 3 3 0 16 2
+name ":"
+name "foldr"
+{ end of foldr }
+global "head" primitive "head"
+global "index" closure bytecode "index" 2 1 3 8 1
+ 7 0 3 0 10 1 5 0 8 0 3 1 2 0 16 2
+bytecode "h" 2 2 3 24 3
+ 11 5 3 1 22 0 8 -1 17 0 3 1 1 0 23 2 5 0 5 1
+ 4 1 2 1 1 1 15 2 13 17 3 0 17 0 3 0 8 1 1 2
+ 15 2 2 0 4 0 16 2
+name ":"
+name "="
+name "+"
+{ end of h }
+{ end of index }
+global "int" primitive "int"
+global "length" closure bytecode "length" 1 2 3 16 3
+ 11 5 3 0 22 0 8 0 17 0 3 0 1 0 23 2 5 0 5 1
+ 2 0 1 1 15 1 8 1 1 2 16 2
+name ":"
+name "length"
+name "+"
+{ end of length }
+global "map" closure bytecode "map" 2 2 4 19 2
+ 11 5 3 1 22 0 9 0 17 0 3 1 1 0 23 2 5 0 5 1
+ 2 1 3 0 15 1 3 0 2 0 1 1 15 2 1 0 16 2
+name ":"
+name "map"
+{ end of map }
+global "member" closure bytecode "member" 2 2 3 21 5
+ 11 5 3 1 22 0 1 0 17 0 3 1 1 1 23 2 5 0 5 1
+ 3 0 2 1 1 2 15 2 13 17 7 3 17 0 3 0 2 0 1 4
+ 16 2
+name "false"
+name ":"
+name "="
+boolean 1
+name "member"
+{ end of member }
+global "not" closure bytecode "not" 1 0 1 6 2
+ 3 0 13 4 1 0 17 0 1 1 17 0
+name "false"
+name "true"
+{ end of not }
+global "numeric" primitive "numeric"
+global "reverse" closure bytecode "reverse" 1 1 3 7 1
+ 7 0 10 0 5 0 3 0 9 0 2 0 16 2
+bytecode "reva" 2 2 4 17 1
+ 11 5 3 0 22 0 3 1 17 0 3 0 1 0 23 2 5 0 5 1
+ 2 0 2 1 3 1 1 0 15 2 4 0 16 2
+name ":"
+{ end of reva }
+{ end of reverse }
+global "tail" primitive "tail"
+global "true" boolean 1
+global "~" primitive "~"
+quit 0
+[Loaded compiler.txt]
