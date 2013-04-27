@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ * h-tiles.html
+ * 
+ * This file is part of GeomLab
+ * Copyright (c) 2005 J. M. Spivey
+ * All rights reserved
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.      
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
+ *    and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products 
+ *    derived from this software without specific prior written permission.
+ *    
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR 
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html>
+<head>
+<title>Making Your Own Tiles</title>
+<link rel="stylesheet" href="style.css">
+<meta name="section" content="using">
+</head>
+
+<body>
+
+<h1>Making Your Own Tiles</h1>
+
+<p>GeomLab comes with a number of pre-defined tiles that can be put
+together into pictures.  But there is also a way to make your own
+tiles, using a 'secret' built-in function called <code>_tile</code>.
+The underscore character at the start of the name <code>_tile</code>
+has no special meaning: it's just there to make it less likely that
+the name will clash with a name that you choose for an object or
+function in your own program.
+The function takes 6 arguments, and a typical call looks like
+this:</p>
+<blockquote><code>_tile(w, h, x0, y0, outlines, fills)</code></blockquote>
+<p>The function creates a rectangular tile that is <code>w</code>
+units wide and <code>h</code> units high, and contains a number of
+outlines drawn in 
+black, and behind them a number of regions filled with colours.  Both
+the outlines and the fills are described using Cartesian coordinates
+relative to an origin that is <code>x0</code> units to the right of and
+<code>y0</code> units above the bottom left corner of the tile.</p>
+
+<p>The argument <code>outlines</code> is a list of outlines,
+and each of these is represented as a list of numbers.  The numbers
+are taken in pairs as the coordinates of points on the outline.  Thus
+each outline is a list of even length.</p>
+
+<p>The argument <code>fills</code> is a list of fills, each a list of odd
+length.  The first element of each list is a colour, created using one
+of the primitives <code>rgb</code> or <code>hsv</code> that are
+described in the <a href="h-library.html">library documentation</a>.
+The remainder of the list contains numbers that are taken two at a time
+as the coordinates of successive points on the boundary of the filled
+region.  If the last point is different from the first, then the
+boundary is implicitly closed with a final line segment back to the
+start.  As a special feature, the initial colour in a fill description
+may be replaced by an integer between 0 and 3.  This integer is then
+taken as an index into a fixed array of four colours, and the
+<code>rot</code> primitive is implemented in such a way that these
+colours rotate as the picture rotates.  This feature is used in the
+Escher picture on Worksheet&nbsp;6.</p>
+
+<p>Here is an example, a tile that has one outline and two fills:</p>
+<!-- @tile1@ tiles-01 -->
+<table class="twin"><tr>
+  <td class="input"><code>_tile(8, 12, 1, 1, [[1,0, 5,0, 5,4, 1,4, 1,0]],<br>
+    &nbsp;&nbsp;[[rgb(1,0,0), 2,3, 6,3, 6,7, 2,7],<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;[rgb(0,1,0), 0,6, 4,6, 4,10, 0,10]])</code></td>
+  <td class="output">
+    <img src="tiles-01.png" alt="picture"></td>
+</tr></table>
+<p>The proportions of this tile are 8 units wide by 12 high, though as
+always its actual dimensions are scaled to fit the window it is drawn
+in.  The coordinates for the shapes that appear on the tile are all
+relative to an origin that is itself displaced by the vector (1, 1)
+from the bottom left corner of the tile: so the left side of the green
+square, although it has an <code>x</code> coordinate of 0, is not in
+fact at the edge of the tile.  This displaced origin helps with
+adjusting the design of tiles, because we can easily change the empty
+border that appears around the edge by changing the dimensions and
+origin, without having to modify the shapes.<p>
+
+<p>As you can see, the three shapes in this tile are all squares.  The
+pure red square (with colour <code>rgb(1,0,0)</code>) is drawn first,
+then the 
+pure green square (colour <code>rgb(0,1,0)</code>), and finally the
+square outline, so that the red square appears to be behind the
+others.  Fills are drawn in the order the appear in the list, followed
+by outlines.</p> 
+
+<p>The simplest tiles consist of a single, filled stick-figure, and for these
+a function <code>_stick(w, h, x0, y0, colour, outline)</code> is provided.
+For example, the standard tile <code>man</code> is defined by</p>
+<p class="equation"><code>define man = _stick(12, 22, -1, -1, rgb(0.85, 0.85, 1.0),<br>
+&nbsp;&nbsp;[4,2, 6,2, 7,6, 8,2, 10,2, 8,10, 8,12, 12,12, 12,16,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;10,16, 10,14, 8,14, 8,16, 10,18, 10,20, 8,22, 6,22,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;4,20, 4,18, 6,16, 6,14, 2,14, 2,12, 6,12, 6,10, 4,2]);</code></p>
+<p>Actually, the function <code>_stick</code> is not a primitive, but
+is itself defined in the GeomLab language as follows:</p>
+<p class="equation"><code>define _stick(w, h, x, y, col, outline) =<br>
+&nbsp;&nbsp;_tile(w, h, x, y, [outline], [col:outline]);</code></p>
+<p>These and other definitions can be found in the file 
+<a href="../boot/prelude.txt"><code>prelude.txt</code></a> that is part of
+the source code for GeomLab itself.</p>
+
+</body>
+</html>

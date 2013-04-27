@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ * h-build.html
+ * 
+ * This file is part of GeomLab
+ * Copyright (c) 2005 J. M. Spivey
+ * All rights reserved
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.      
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *    this list of conditions and the following disclaimer in the documentation 
+ *    and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products 
+ *    derived from this software without specific prior written permission.
+ *    
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR 
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html>
+<head>
+<title>Building GeomLab</title>
+<link rel="stylesheet" href="style.css">
+<meta name="section" content="using">
+</head>
+
+<body>
+
+<h1>Building GeomLab</h1>
+
+<p>The GeomLab system consists of the programming environment,
+  implemented as a Java Swing application (geomlab), an abstract
+  machine for running programs in the GeomLab language that is
+  implemented by an interpreter written in Java (funbase), a
+  collection of plug-in features for the language (plugins), and a
+  compiler from the GeomLab language to the abstract machine.  The
+  scanner and parser for the language are implemented in Java as part
+  of the funbase package, but the translation phase is implemented in
+  the language itself, and the build process therefore requires a
+  bootstrap copy of the object code for the compiler.</p>
+
+<p>The complete build process goes as follows:<p>
+
+<ol>
+<li>Compile the Java source, using a command such as<br>
+    <code>javac funbase/*.java geomlab/*.java plugins/*.java</code>
+<li>Use the bootstrap code to compile the compiler:<br>
+    <code>java geomlab.RunScript -b boot.txt compiler.txt 
+	&gt;stage1.boot</code>
+<li>Use the compiler to compile itself:<br>
+    <code>java geomlab.RunScript -b stage1.boot compiler.txt
+    &gt;stage2.boot</code>
+<li>Use the compiler to compile itself again:<br>
+    <code>java geomlab.RunScript -b stage2.boot compiler.txt
+    &gt;stage3.boot</code><br>
+    The files <code>stage2.boot</code>
+    and <code>stage3.boot</code> should be identical.
+<li>Make a session image containing the compiler and the prelude:<br>
+    <code>java geomlab.RunScript -b stage2.boot prelude.txt
+    -e '_dump("geomlab.gls")'</code>
+</ol>
+
+<p>Now it should be possible to run the GeomLab application
+with <code>java geomlab.GeomLab</code>.  By default, this initially
+loads the session image <code>geomlab.gls</code> prepared above.</p>
+
+<p>Strictly speaking, it is not necessary to go through stages (2),
+  (3) and (4) of the build process shown here: the bootstrap
+  file <code>boot.txt</code> can be used directly in place
+  of <code>stage2.boot</code> in stage (5).  
+  However, if there have been changes to the compiler, the whole
+  process is necessary in order to get the system into a stable state.</p>
+
+<p>There are two object code formats used in the process above: the
+  file <code>boot.txt</code> is in a special, textual format that is
+  capable of storing only a limited number of kinds of value, and the
+  final image <code>geomlab.gls</code> is in a binary format that uses
+  Java serialization and can store all kinds of value.  The textual
+  format is used to get round problems with serialization when the
+  underlying Java classes are subject to change.</p>
+
+</body>
+</html>

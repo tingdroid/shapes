@@ -107,6 +107,11 @@ public class HelpFrame extends JFrame {
     /** Index in the history */
     private int index = -1;
     
+    /** Resolve a page URL given token */
+    public static URL pageUrl(String page) {
+	return loader.getResource("doc/h-"+page+".html");
+    }
+    
     /** Visit the next page in the history */
     public void goForward() {
 	if (index+1 < history.size())
@@ -121,7 +126,7 @@ public class HelpFrame extends JFrame {
     
     /** Visit the contents page */
     public void goHome()  {
-	visitPage(loader.getResource("h-contents.html"));
+	visitPage(pageUrl("contents"));
     }
     
     /** Visit a named page and add it to the history */
@@ -164,7 +169,7 @@ public class HelpFrame extends JFrame {
     /** Show help after an error message */
     public static void errorHelp(String tag) {
 	openFrame();
-	URL errpage = loader.getResource("h-errors.html");
+	URL errpage = pageUrl("errors");
 	if (errpage == null) return;
 	try {
 	    URL anchor = new URL(errpage.toString() + tag);
