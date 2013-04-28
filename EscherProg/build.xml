@@ -77,7 +77,7 @@
 	</target>
 
     <target name="clean" description="Clean EscherProg Java Classes">
-        <delete dir="bin"/>
+        <delete dir="${bin.dir}"/>
     </target>
 
     <target name="init">
@@ -96,13 +96,16 @@
         </copy>
         </target>
 
-	<target name="build" depends="clean,init" description="Build EscherProg Java Classes">
-        <echo message="${ant.project.name}: ${ant.file}"/>
+	<target name="compile" description="Compile EscherProg Java Classes">
         <javac debug="true" debuglevel="${debuglevel}" destdir="${bin.dir}" includeantruntime="false" 
         		source="${source}" target="${target}">
             <src path="${src.dir}"/>
             <classpath refid="prog.classpath"/>
         </javac>
+    </target>
+
+   	<target name="build" depends="clean,init,compile,boot" description="Build EscherProg">
+        <echo message="${ant.project.name}: ${ant.file}"/>
     </target>
 
 	<target name="clean-jar" description="Clean EscherProg Jar">
