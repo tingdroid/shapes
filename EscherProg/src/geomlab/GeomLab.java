@@ -38,22 +38,25 @@ import java.io.StringReader;
 
 import javax.swing.JFrame;
 
+import plugins.Drawable;
+
 import funbase.Name;
 import funbase.Value;
 import geomlab.Command.CommandException;
 
-/** The main appplication class for GeomLab.
+/**
+ * The main application class for GeomLab.
  * 
- *  The Geomlab application is made up of three parts: (i) an interpreter for
- *  the core of the GeomLab language, (iii) a graphical interface where you can
- *  enter GeomLab expressions and have them submitted to the interpreter,
- *  and (iii) a collection of classes that implement primitives that are
- *  included in the initial environment of the interpreter.  These pieces are
- *  quite independent of each other: for example, the interpreter knows
- *  nothing about the data type of pictures that's implemented by the
- *  Picture class.  The GUI knows how to display pictures that satisfy the
- *  GraphBox.Drawable interface (as instances of Picture do), but does not
- *  know any details of how pictures are made up.
+ * The Geomlab application is made up of three parts: (i) an interpreter for the
+ * core of the GeomLab language, (ii) a graphical interface where you can enter
+ * GeomLab expressions and have them submitted to the interpreter, and (iii) a
+ * collection of classes that implement primitives that are included in the
+ * initial environment of the interpreter. These pieces are quite independent of
+ * each other: for example, the interpreter knows nothing about the data type of
+ * pictures that's implemented by the Picture class. The GUI knows how to
+ * display pictures that satisfy the {@link plugins.Drawable} interface (as
+ * instances of {@link plugins.Picture Picture} do), but does not know any
+ * details of how pictures are made up.
  */
 public class GeomLab extends GeomBase {
     private static final String svnid =
@@ -103,10 +106,10 @@ public class GeomLab extends GeomBase {
 
     /** Update the picture display */
     protected void displayUpdate(Value val) {
-	if (val == null || !(val instanceof GraphBox.Drawable))
+	if (val == null || !(val instanceof Drawable))
 	    arena.setPicture(null);
 	else {
-	    arena.setPicture((GraphBox.Drawable) val);
+	    arena.setPicture((Drawable) val);
 	    if (! arena.isVisible())
 		arena.setVisible(true);
 	    if (arena.getExtendedState() == JFrame.ICONIFIED)

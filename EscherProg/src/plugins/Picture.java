@@ -31,7 +31,6 @@
 package plugins;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,7 +39,6 @@ import funbase.Evaluator;
 import funbase.Primitive;
 import funbase.Value;
 import geomlab.GraphBox;
-import geomlab.GraphBox.Drawable;
 
 /* The pictures that GeomLab works with do not have a fixed size, but
  may be scaled uniformly to achieve any desired height or
@@ -77,13 +75,11 @@ public class Picture extends Value implements Drawable {
     
     public boolean isInteractive() { return interactive; }
     
-    public void draw(Graphics2D g2, int ww, int hh, 
-	    Color background, float slider) {
-	Tablet gc = new ScreenTablet(g2, slider);
+    public void draw(Tablet tablet, int ww, int hh, Color background) {
 	Tran2D t = Tran2D.translation(0, hh).scale(ww, -hh);
-	gc.fillOutline(unitsquare, background, t);
-	paintPart(FILL, -1, gc, t);
-	paintPart(DRAW, -1, gc, t);
+	tablet.fillOutline(unitsquare, background, t);
+	paintPart(FILL, -1, tablet, t);
+	paintPart(DRAW, -1, tablet, t);
     }
     
     public static final int DRAW = 1, FILL = 2;

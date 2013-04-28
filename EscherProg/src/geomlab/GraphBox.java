@@ -56,6 +56,9 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import plugins.Drawable;
+import plugins.ScreenTablet;
+
 /** A Frame for displaying a Picture object */
 public class GraphBox extends JFrame implements Printable {
     private static final String svnid =
@@ -89,7 +92,9 @@ public class GraphBox extends JFrame implements Printable {
 		ww = (int) (h * aspect + 0.5f);
 	    
 	    g2.translate((w - ww)/2, (h - hh)/2);
-	    picture.draw(g2, ww, hh, Color.white, sliderValue());
+	    
+	    ScreenTablet tablet = new ScreenTablet(g2, sliderValue());
+	    picture.draw(tablet, ww, hh, Color.white);
 	}
     };
     
@@ -146,14 +151,6 @@ public class GraphBox extends JFrame implements Printable {
 	return picture;
     }
     
-    /** A scalable picture with fixed aspect ratio */
-    public interface Drawable {
-	public float getAspect();
-	public boolean isInteractive();
-	public void draw(Graphics2D g, int ww, int hh, 
-		Color background, float slider);
-    }
-
     public boolean isAntialiased() { return antialiased; }
     
     public void setAntialiased(boolean antialiased) {
@@ -197,8 +194,8 @@ public class GraphBox extends JFrame implements Printable {
 	
 	Graphics2D g2 = (Graphics2D) g;
 	g2.translate(x, y);
-	picture.draw(g2, (int) width, (int) height, Color.white,
-		sliderValue());
+	ScreenTablet tablet = new ScreenTablet(g2, sliderValue());
+	picture.draw(tablet, (int) width, (int) height, Color.white);
 	
 	return Printable.PAGE_EXISTS;
     }
@@ -232,7 +229,8 @@ public class GraphBox extends JFrame implements Printable {
     	Graphics2D g2 = (Graphics2D) g;
     	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
     		RenderingHints.VALUE_ANTIALIAS_ON);
-    	pic.draw(g2, width, height, background, slider);
+    	ScreenTablet tablet = new ScreenTablet(g2, slider);
+    	pic.draw(tablet, width, height, background);
         ImageIO.write(image, "png", file);
     }
 }   
