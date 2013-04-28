@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.Color;
 import java.util.Stack;
 
 import funbase.Primitive;
@@ -46,7 +45,7 @@ public class BushPicture extends Picture {
     protected static float linewidth = 2.0f;
     protected static float alpha = 10.0f, theta = 20.0f; 
     private static Tran2D rot, invrot;
-    protected static Color palette[];
+    protected static int palette[];
     
     static { setColours(20, 0.3f, 0.5f, 0.7f); }
 
@@ -174,10 +173,10 @@ public class BushPicture extends Picture {
     /** Set the palette of colours accessed by C and c commands */
     public static void setColours(int ncols, 
 	    float inithue, float sat, float val) {
-	palette = new Color[ncols];
+	palette = new int[ncols];
 	for (int c = 0; c < ncols; c++)
 	    palette[c] = 
-		Color.getHSBColor(inithue + (float) c / ncols, sat, val);
+		RGB.fromHSB(inithue + (float) c / ncols, sat, val);
     }
     
     public static final Primitive primitives[] = {

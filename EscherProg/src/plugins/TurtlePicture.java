@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.Color;
 import java.io.PrintWriter;
 
 import funbase.Evaluator;
@@ -48,6 +47,7 @@ public class TurtlePicture extends Picture {
     public final float xmin, xmax, ymin, ymax;
     
     public static final float R = 0.5f;
+    private static final int STROKE_COLOR = RGB.BLACK;
 
     public TurtlePicture(Command commands[]) {
 	super(calcAspect(commands));
@@ -127,7 +127,7 @@ public class TurtlePicture extends Picture {
 		    float yc = y + R * Vec2D.cosd(dir);
 		    Vec2D centre = posVec(xc, yc);
 		    g.drawArc(centre, R/(xmax-xmin), R/(ymax-ymin),
-			    dir-90, a, Color.black, t);
+			    dir-90, a, STROKE_COLOR, t);
 		    x = xc + R * Vec2D.sind(dir+a); 
 		    y = yc - R * Vec2D.cosd(dir+a);
 		    dir += a;
@@ -140,7 +140,7 @@ public class TurtlePicture extends Picture {
 		    float yc = y - R * Vec2D.cosd(dir);
 		    Vec2D centre = posVec(xc, yc);
 		    g.drawArc(centre, 0.5f/(xmax-xmin), 0.5f/(ymax-ymin),
-			    dir+90, -a, Color.black, t);
+			    dir+90, -a, STROKE_COLOR, t);
 		    x = xc - R * Vec2D.sind(dir-a); 
 		    y = yc + R * Vec2D.cosd(dir-a);
 		    dir -= a;
@@ -152,7 +152,7 @@ public class TurtlePicture extends Picture {
 		    x += cmd.arg * Vec2D.cosd(dir); 
 		    y += cmd.arg * Vec2D.sind(dir);
 		    Vec2D pos = posVec(x, y);
-		    g.drawLine(oldpos, pos, Color.black, t);
+		    g.drawLine(oldpos, pos, STROKE_COLOR, t);
 		    break;
 		}
 	    }

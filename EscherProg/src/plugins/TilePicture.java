@@ -44,10 +44,10 @@ public class TilePicture extends Picture {
     public final int tileid = ntiles++;
     protected Vec2D strokes[][];
     protected Vec2D outlines[][];
-    protected Object colours[];
+    protected int colours[];
 
     public TilePicture(float width, float height, 
-	    Vec2D strokes[][], Vec2D outlines[][], Object colours[]) {
+	    Vec2D strokes[][], Vec2D outlines[][], int colours[]) {
 	super(width / height);
 	this.strokes = strokes;
 	this.outlines = outlines;
@@ -85,7 +85,7 @@ public class TilePicture extends Picture {
 		int nOutlines = cxt.listLength(args[base+5]);
 		Vec2D strokes[][] = new Vec2D[nStrokes][], 
 		outlines[][] = new Vec2D[nOutlines][];
-		Object colours[] = new Object[nOutlines];
+		int colours[] = new int[nOutlines];
 		Value xss;
 
 		xss = args[base+4];

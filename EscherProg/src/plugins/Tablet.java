@@ -30,13 +30,12 @@
 
 package plugins;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 /** A 'drawing tablet' on which a picture can be drawn */
 public abstract class Tablet {
     private final float slider;
-    protected final Color palette[];
+    protected final int palette[];
 
     public Tablet(float slider) {
 	this.slider = slider;
@@ -47,29 +46,28 @@ public abstract class Tablet {
 
     /** Fill an outline, using the palette for indexed colours */
     public void fillOutline(Vec2D outline[],
-	    Object spec, int col, Tran2D t) {
-	if (spec instanceof Color) {
-	    fillOutline(outline, (Color) spec, t);
+	    int spec, int col, Tran2D t) {
+	if (RGB.isColor(spec)) {
+	    fillOutline(outline, spec, t);
 	}
-	else if (spec instanceof Integer && col >= 0) {
-	    int index = ((Integer) spec).intValue();
-	    Color color = palette[(index + col) % palette.length];
+	else if (col >= 0) {
+	    int color = palette[(spec + col) % palette.length];
 	    fillOutline(outline, color, t);
 	}
     }
 
     public abstract void drawStroke(Vec2D stroke[], Tran2D t);
     public abstract void fillOutline(Vec2D outline[], 
-	    Color color, Tran2D t);
+	    int color, Tran2D t);
     public abstract void drawLine(Vec2D from, Vec2D to, 
-	    Color color, Tran2D t);
+	    int color, Tran2D t);
 
     /** Draw an arc of the unit circle, magnified by xrad in the 
      * x direction and yrad in the y direction.  The arc starts at
      * angle start, measured in degrees counterclockwise from the
      * x axis, and extends to angle start+extent. */
     public abstract void drawArc(Vec2D centre, float xrad, float yrad, 
-	    float start, float extent, Color color, Tran2D t);
+	    float start, float extent, int color, Tran2D t);
 
     /** Save the graphics state on a stack */
     public abstract void save();

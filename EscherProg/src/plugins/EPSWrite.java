@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -64,9 +63,9 @@ public class EPSWrite extends Tablet {
 	
 	pr.printf("/palette [");
 	for (int i = 0; i < 4; i++) {
-	    Color c = palette[i];
-	    pr.printf(" [ %.3f %.3f %.3f ]", c.getRed()/255.0f,
-		    c.getGreen()/255.0f, c.getBlue()/255.0f);
+	    int c = palette[i];
+	    pr.printf(" [ %.3f %.3f %.3f ]", RGB.red(c)/255.0f,
+		    RGB.green(c)/255.0f, RGB.blue(c)/255.0f);
 	}
 	pr.printf(" ] def\n");
     }
@@ -118,13 +117,13 @@ public class EPSWrite extends Tablet {
 	pr.close();
     }
 
-    private void writeColor(Color color) {
-	int r = color.getRed();
-	if (color.getGreen() == r && color.getBlue() == r)
+    private void writeColor(int color) {
+	int r = RGB.red(color);
+	if (RGB.green(color) == r && RGB.blue(color) == r)
 	    pr.printf("%.3f setgray\n", r/255.0f);
 	else
-	    pr.printf("%.3f %.3f %.3f setrgbcolor\n", color.getRed()/255.0f,
-		    color.getGreen()/255.0f, color.getBlue()/255.0f);
+	    pr.printf("%.3f %.3f %.3f setrgbcolor\n", r/255.0f,
+		    RGB.green(color)/255.0f, RGB.blue(color)/255.0f);
     }
 
     private void writePolygon(Vec2D[] points, Tran2D t) {
@@ -172,7 +171,7 @@ public class EPSWrite extends Tablet {
 	pr.printf("resettransform\n");
     }
 
-    public void drawLine(Vec2D from, Vec2D to, Color color, Tran2D t) {
+    public void drawLine(Vec2D from, Vec2D to, int color, Tran2D t) {
 	writeColor(color);
 	Vec2D a = t.transform(from), b = t.transform(to);
 	pr.printf("newpath %.3f %.3f moveto %.3f %.3f lineto stroke\n",
@@ -187,7 +186,7 @@ public class EPSWrite extends Tablet {
     public void drawTile(TilePicture tile, int layer, int col, Tran2D t) {
 	int id = tile.tileid;
 	Vec2D strokes[][] = tile.strokes, outlines[][] = tile.outlines;
-	Object colours[] = tile.colours;
+	int colours[] = tile.colours;
 	
 	if (! knownTiles.contains(id)) {
 	    /* Carefully apply the transform to the path but not to the
@@ -206,15 +205,14 @@ public class EPSWrite extends Tablet {
 		writePolygon(outlines[i], Tran2D.identity);
 		pr.printf("resettransform\n");
 
-		Object spec = colours[i];
-		if (spec instanceof Color) {
-		    writeColor((Color) spec);
+		int spec = colours[i];
+		if (RGB.isColor(spec)) {
+		    writeColor(spec);
 		    pr.printf("fill\n");
 		}
-		else if (spec instanceof Integer) {
+		else {
 		    if (col < 0) continue;
-		    int index = ((Integer) spec).intValue();
-		    pr.printf("%d palettefill\n", index);
+		    pr.printf("%d palettefill\n", spec);
 		}
 	    }
 	    pr.printf("} bind def\n");
@@ -293,7 +291,7 @@ public class EPSWrite extends Tablet {
     }
 
     public void drawArc(Vec2D centre, float xrad, float yrad,
-	    float start, float extent, Color color, Tran2D t) {
+	    float start, float extent, int color, Tran2D t) {
 	writeColor(color);
 	writeTransform(t.translate(centre.x, centre.y).scale(xrad, yrad));
 	String op = (extent >= 0 ? "arc": "arcn");
@@ -307,7 +305,7 @@ public class EPSWrite extends Tablet {
 	pr.printf("stroke\n");
     }
 
-    public void fillOutline(Vec2D[] outline, Color color, Tran2D t) {
+    public void fillOutline(Vec2D[] outline, int color, Tran2D t) {
 	writeColor(color);
 	
 	if (outline == Picture.unitsquare) {
@@ -345,7 +343,7 @@ public class EPSWrite extends Tablet {
 		String fname = cxt.string(args[base+1]);
 		float meanSize = (float) cxt.number(args[base+2]);
 		float greyLevel = (float) cxt.number(args[base+3]);
-		Color background = new Color(greyLevel, greyLevel, greyLevel);
+		int background = RGB.fromRGB(greyLevel, greyLevel, greyLevel);
 
 		/* The dimensions of the image are chosen to give
 		 * the right aspect ratio, and so that the

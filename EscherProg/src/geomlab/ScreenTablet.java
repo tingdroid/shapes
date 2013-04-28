@@ -28,7 +28,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package plugins;
+package geomlab;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -40,6 +40,10 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Stack;
+
+import plugins.Tablet;
+import plugins.Tran2D;
+import plugins.Vec2D;
 
 /** Painting context for drawing on the screen */
 public class ScreenTablet extends Tablet {
@@ -71,27 +75,27 @@ public class ScreenTablet extends Tablet {
 	gcxt.drawLine(xx[n-1], yy[n-1], xx[n-1], yy[n-1]);
     }
 
-    public void fillOutline(Vec2D[] outline, Color color, Tran2D t) {
+    public void fillOutline(Vec2D[] outline, int color, Tran2D t) {
 	int n = outline.length;
 	int xx[] = new int[n], yy[] = new int[n];
 	for (int j = 0; j < n; j++) {
 	    xx[j] = t.scaleX(outline[j]);
 	    yy[j] = t.scaleY(outline[j]); 
 	}
-	gcxt.setColor(color);
+	gcxt.setColor(new Color(color));
 	gcxt.fillPolygon(xx, yy, n);
     }
     
     // drawLine and drawArc can use the rounding from Java2D
 
-    public void drawLine(Vec2D from, Vec2D to, Color color, Tran2D t) {
+    public void drawLine(Vec2D from, Vec2D to, int color, Tran2D t) {
 	Vec2D a = t.transform(from), b = t.transform(to);
-	gcxt.setColor(color);
+	gcxt.setColor(new Color(color));
 	gcxt.draw(new Line2D.Float(a.x, a.y, b.x, b.y));
     }
 
     public void drawArc(Vec2D centre, float xrad, float yrad,
-	    float start, float extent, Color color, Tran2D t) {
+	    float start, float extent, int color, Tran2D t) {
 	// Java assumes a barbarian coordinate system, so we must negate
 	// the angles here:
 	Shape arc0 = 
@@ -100,7 +104,7 @@ public class ScreenTablet extends Tablet {
 	AffineTransform tt = t.asAffineTransform();
 	GeneralPath arc = new GeneralPath();
 	arc.append(arc0.getPathIterator(tt), false);
-	gcxt.setColor(color);
+	gcxt.setColor(new Color(color));
 	gcxt.draw(arc);
     }
     

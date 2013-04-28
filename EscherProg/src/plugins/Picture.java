@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -62,6 +61,7 @@ public class Picture extends Value implements Drawable {
 
     private final float aspect; // = width / height
     private final boolean interactive; // whether we use slider value
+    private static final int STROKE_COLOR = RGB.BLACK;
     
     public Picture(float aspect) { this(aspect, false); }
     
@@ -75,9 +75,9 @@ public class Picture extends Value implements Drawable {
     
     public boolean isInteractive() { return interactive; }
     
-    public void draw(Tablet tablet, int ww, int hh, Color background) {
+    public void draw(Tablet tablet, int ww, int hh, int backgroundColor) {
 	Tran2D t = Tran2D.translation(0, hh).scale(ww, -hh);
-	tablet.fillOutline(unitsquare, background, t);
+	tablet.fillOutline(unitsquare, backgroundColor, t);
 	paintPart(FILL, -1, tablet, t);
 	paintPart(DRAW, -1, tablet, t);
     }
@@ -92,7 +92,7 @@ public class Picture extends Value implements Drawable {
 	// Give up if the drawing space is negligibly small
 	if (g.isTiny(t)) {
 	    if (layer == DRAW)
-		g.fillOutline(unitsquare, Color.black, t);
+		g.fillOutline(unitsquare, STROKE_COLOR, t);
 	    return;
 	}
 	
@@ -122,12 +122,11 @@ public class Picture extends Value implements Drawable {
     protected static float hbase = 0.3f, hstep = 0.1f, 
 	svalue = 0.5f, bvalue = 1.0f;
 
-    public static Color[] makePalette(float slider) {
-	Color palette[] = new Color[4];
+    public static int[] makePalette(float slider) {
+	int palette[] = new int[4];
 	float base = hbase + 2.0f * slider - 1.0f;
 	for (int i = 0; i < 4; i++)
-	    palette[i] = 
-		Color.getHSBColor(base + i * hstep, svalue, bvalue);
+	    palette[i] = RGB.fromHSB(base + i * hstep, svalue, bvalue);
 	return palette;
     }
 	    
@@ -333,7 +332,7 @@ public class Picture extends Value implements Drawable {
 		String fname = cxt.string(args[base+1]);
 		int meanSize = (int) cxt.number(args[base+2]);
 		float greyLevel = (float) cxt.number(args[base+3]);
-		Color background = new Color(greyLevel, greyLevel, greyLevel); 
+		int background = RGB.fromRGB(greyLevel, greyLevel, greyLevel); 
 		
 		try {
 		    GraphBox.writePicture(pic, meanSize, 0.5f, background, 

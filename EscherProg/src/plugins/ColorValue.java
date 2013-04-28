@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.Color;
 import java.io.PrintWriter;
 
 import funbase.Evaluator;
@@ -52,7 +51,7 @@ public class ColorValue extends Value {
     
     public final double r, g, b;
     public final int rgb;
-    private Color color = null;
+    private int color = 0;
     
     public ColorValue(double rf, double gf, double bf) {
 	Evaluator.countCons();
@@ -71,9 +70,8 @@ public class ColorValue extends Value {
 	b = (rgb & 0xff)/255.0;
     }
     
-    public Color asColor() { 
-	if (color == null) color = new Color(rgb);
-	return color; 
+    public int asColor() { 
+	return rgb | 0xff000000; 
     }
     
     public void printOn(PrintWriter out) {
@@ -118,7 +116,7 @@ public class ColorValue extends Value {
 	new Primitive("hsv", 3) {
 	    /* Create a colour from HSV values in the range [0, 1] */
 	    public Value invoke(Value args[], int base) {
-		int rgb = Color.HSBtoRGB(
+		int rgb = RGB.fromHSB(
 			(float) cxt.number(args[base+0]),
 			(float) cutoff(cxt.number(args[base+1])),
 			(float) cutoff(cxt.number(args[base+2])));

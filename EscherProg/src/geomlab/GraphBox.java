@@ -57,7 +57,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import plugins.Drawable;
-import plugins.ScreenTablet;
 
 /** A Frame for displaying a Picture object */
 public class GraphBox extends JFrame implements Printable {
@@ -94,7 +93,7 @@ public class GraphBox extends JFrame implements Printable {
 	    g2.translate((w - ww)/2, (h - hh)/2);
 	    
 	    ScreenTablet tablet = new ScreenTablet(g2, sliderValue());
-	    picture.draw(tablet, ww, hh, Color.white);
+	    picture.draw(tablet, ww, hh, Color.white.getRGB());
 	}
     };
     
@@ -195,7 +194,7 @@ public class GraphBox extends JFrame implements Printable {
 	Graphics2D g2 = (Graphics2D) g;
 	g2.translate(x, y);
 	ScreenTablet tablet = new ScreenTablet(g2, sliderValue());
-	picture.draw(tablet, (int) width, (int) height, Color.white);
+	picture.draw(tablet, (int) width, (int) height, Color.white.getRGB());
 	
 	return Printable.PAGE_EXISTS;
     }
@@ -211,11 +210,11 @@ public class GraphBox extends JFrame implements Printable {
     public boolean isPicture() { return picture != null; }
 
     public void writePicture(File file) throws IOException {
-	writePicture(picture, imageMean, sliderValue(), Color.white, file);
+	writePicture(picture, imageMean, sliderValue(), Color.white.getRGB(), file);
     }
     
     public static void writePicture(Drawable pic, int meanSize, float slider,
-	    Color background, File file) throws IOException {
+	    int background, File file) throws IOException {
     	/* The dimensions of the image are chosen to give
     	 * approximately the right aspect ratio, and so that the
     	 * geometric mean of width and height is approx. meanSize */
