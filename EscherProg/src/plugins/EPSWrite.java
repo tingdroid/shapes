@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,6 +40,7 @@ import java.util.Set;
 
 import funbase.Primitive;
 import funbase.Value;
+import geomlab.Image;
 
 
 /** Picture context that outputs Encapsulated PostScript */
@@ -149,7 +149,7 @@ public class EPSWrite extends Tablet {
 	}
     }
     
-    public void drawImage(BufferedImage image, Tran2D t) {
+    public void drawImage(Image image, Tran2D t) {
 	// See Red Book, page 310
 	
 	int w = image.getWidth(), h = image.getHeight();

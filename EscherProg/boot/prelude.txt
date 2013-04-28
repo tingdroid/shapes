@@ -104,6 +104,14 @@ _install("BushPicture");
 define bush = _primitive("bush");
 define _bushparams = _primitive("bushparams");
 
+_install("ImagePicture");
+define photo = _primitive("photo");         { photo(url) }
+define resource = _primitive("resource");   { resource(name) }
+define image = _primitive("image");         { image(width, height, fun) }
+define pixel = _primitive("pixel");         { pixel(image, x, y) }
+define width = _primitive("width");         { width(image) }
+define height = _primitive("height");       { height(image) }
+
 
 { BASIC DEFINITIONS }
 

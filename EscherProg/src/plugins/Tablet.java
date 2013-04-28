@@ -30,7 +30,7 @@
 
 package plugins;
 
-import java.awt.image.BufferedImage;
+import geomlab.Image;
 
 /** A 'drawing tablet' on which a picture can be drawn */
 public abstract class Tablet {
@@ -79,7 +79,7 @@ public abstract class Tablet {
     public abstract void setStroke(float width);
     
     /** Draw a raster image */
-    public abstract void drawImage(BufferedImage image, Tran2D t);
+    public abstract void drawImage(Image image, Tran2D t);
     
     public abstract boolean isTiny(Tran2D t);
 

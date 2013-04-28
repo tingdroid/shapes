@@ -30,16 +30,6 @@
 
 package plugins;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
-
 import funbase.ErrContext;
 import funbase.Evaluator;
 import funbase.Evaluator.Continuation;
@@ -47,23 +37,29 @@ import funbase.Evaluator.EvalException;
 import funbase.Evaluator.Result;
 import funbase.Primitive;
 import funbase.Value;
+import geomlab.Image;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.URL;
 
 public class ImagePicture extends Picture {
     private static final String svnid =
 	"$Id: ImagePicture.java 365 2008-06-11 17:11:29Z mike $";
     private static final long serialVersionUID = 1L;
     
-    public transient BufferedImage image;
+    public transient Image image;
     private String resourceName = null;
     
-    public ImagePicture(BufferedImage image, String resourceName) {
+    public ImagePicture(Image image, String resourceName) {
 	super((float) image.getWidth() / image.getHeight());
 	this.image = image;
 	this.resourceName = resourceName;
     }
     
-    public ImagePicture(BufferedImage image) {
+    public ImagePicture(Image image) {
 	this(image, null);
     }
     
@@ -94,13 +90,13 @@ public class ImagePicture extends Picture {
 	stream.defaultReadObject();
 	
 	if (resourceName != null) {
-	    image = loadResource(resourceName);
+	    image = Image.fromResource(resourceName);
 	    return;
 	}
 	
 	int w = stream.readInt();
 	int h = stream.readInt();
-	image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+	image = new Image(w, h, Image.TYPE_INT_RGB);
 	for (int y = 0; y < h; y++)
 	    for (int x = 0; x < w; x++)
 		image.setRGB(x, y, stream.readInt());
@@ -109,7 +105,7 @@ public class ImagePicture extends Picture {
     /** A process that controls filling in an image by calling a function
      	for each pixel. */
     private static class PixelLoop extends Continuation implements Result {
-	private final BufferedImage image;
+	private final Image image;
 	private final int width, height;
 	private final Value fun;
 	private final ErrContext cxt;
@@ -122,7 +118,7 @@ public class ImagePicture extends Picture {
 	    this.width = width;
 	    this.height = height;
 	    this.image = 
-		new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		new Image(width, height, Image.TYPE_INT_RGB);
 	    this.fun = fun;
 	    this.cxt = cxt;
 	    this.cont = cont;
@@ -152,31 +148,23 @@ public class ImagePicture extends Picture {
     
     public static Value fromResource(String name) {
 	try {
-	    return new ImagePicture(loadResource(name), name);
+	    return new ImagePicture(Image.fromResource(name), name);
 	}
 	catch (IOException e) {
 	    return Value.nil;
 	}
     }
     
-    protected static BufferedImage loadResource(String name) 
-    							throws IOException {
-	ClassLoader loader = ImagePicture.class.getClassLoader();
-	InputStream in = loader.getResourceAsStream(name);
-	BufferedImage image = ImageIO.read(in);
-	in.close();
-	return image;
-    }
-    
     public static final Primitive primitives[] = {
 	new Primitive("photo", 1) {
 	    public Value invoke(Value args[], int base) {
 		try {
-		    String name = cxt.string(args[base+0]);
-		    URL url = new URL(name);
-		    InputStream in = url.openStream();
-		    BufferedImage image = ImageIO.read(in);
-		    in.close();
+		    String name = cxt.string(args[base + 0]);
+		    if (name.indexOf(':') < 0)
+			name = "file:" + name;
+		    Image image = Image.fromUrl(new URL(name));
+		    if (image == null)
+			cxt.primFail("Error loading photo: " + name);
 		    return new ImagePicture(image);
 		}
 		catch (IOException e) {
@@ -190,9 +178,12 @@ public class ImagePicture extends Picture {
 	    public Value invoke(Value args[], int base) {
 		try {
 		    String name = cxt.string(args[base+0]);
-		    return new ImagePicture(loadResource(name), name);
+		    Image image = Image.fromResource(name);
+		    if (image == null) cxt.primFail("Error loading resource: " + name);
+		    return new ImagePicture(image, name);
 		}
 		catch (IOException e) {
+		    cxt.primFail("Image I/O error - " + e);
 		    return Value.nil;
 		}
 	    }

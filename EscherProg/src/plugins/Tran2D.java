@@ -30,7 +30,6 @@
 
 package plugins;
 
-import java.awt.geom.AffineTransform;
 
 /** An affine transformation in 2D, represented by six real coefficients:
  *  [x'] = [m_xx  m_xy] [x] + [m_x]
@@ -60,11 +59,6 @@ public class Tran2D implements java.io.Serializable {
     public Vec2D getOrigin() { return new Vec2D(m_x, m_y); }
     public Vec2D getXaxis() { return new Vec2D(m_xx, m_yx); }
     public Vec2D getYaxis() { return new Vec2D(m_xy, m_yy); }
-    
-    /** Convert to an AffineTransform object */
-    public AffineTransform asAffineTransform() {
-	return new AffineTransform(m_xx, m_yx, m_xy, m_yy, m_x, m_y);
-    }
     
     /** Compose this transform (on the left) with another one on the right */
     public Tran2D concat(Tran2D t) {
@@ -140,5 +134,29 @@ public class Tran2D implements java.io.Serializable {
     public boolean isTiny(float eps) {
 	return Math.abs(m_xx) <= eps && Math.abs(m_yx) <= eps 
 		|| Math.abs(m_xy) <= eps && Math.abs(m_yy) <= eps;
+    }
+
+    public float xx() {
+        return m_xx;
+    }
+
+    public float yx() {
+        return m_yx;
+    }
+
+    public float xy() {
+        return m_xy;
+    }
+
+    public float yy() {
+        return m_yy;
+    }
+
+    public float x() {
+        return m_x;
+    }
+
+    public float y() {
+        return m_y;
     }
 }

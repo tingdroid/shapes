@@ -38,7 +38,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
-import java.awt.image.BufferedImage;
 import java.util.Stack;
 
 import plugins.Tablet;
@@ -101,7 +100,8 @@ public class ScreenTablet extends Tablet {
 	Shape arc0 = 
 	    new Arc2D.Float(centre.x-xrad, centre.y-yrad, 
 		    2*xrad, 2*yrad, -start, -extent, Arc2D.OPEN);
-	AffineTransform tt = t.asAffineTransform();
+	AffineTransform tt = new AffineTransform(t.xx(), t.yx(), t.xy(),
+		t.yy(), t.x(), t.y());
 	GeneralPath arc = new GeneralPath();
 	arc.append(arc0.getPathIterator(tt), false);
 	gcxt.setColor(new Color(color));
@@ -123,7 +123,7 @@ public class ScreenTablet extends Tablet {
 	gcxt.setStroke(new BasicStroke(width));
     }
 
-    public void drawImage(BufferedImage image, Tran2D t) {
+    public void drawImage(Image image, Tran2D t) {
 	/* We draw the photo slightly large, so that it overlaps the
 	 * bounding box slightly on all sides.  This avoids unsightly
 	 * white lines between adjacent photos. */
@@ -132,7 +132,9 @@ public class ScreenTablet extends Tablet {
 	final float m = 1;  // Overlap in pixels
 	Tran2D t1 = t.scale(1/u, 1/v).translate(-m, v+m)
 					.scale((u+2*m)/w, -(v+2*m)/h);
-	gcxt.drawImage(image, t1.asAffineTransform(), null);
+	AffineTransform tt = new AffineTransform(t1.xx(), t1.yx(), t1.xy(),
+		t1.yy(), t1.x(), t1.y());
+	gcxt.drawImage(image, tt, null);
     }
 
     public boolean isTiny(Tran2D t) {
