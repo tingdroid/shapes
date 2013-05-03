@@ -32,3 +32,6 @@ lint.xml
 
 # assets
 assets/
+
+# ArgoUML
+*.*~
