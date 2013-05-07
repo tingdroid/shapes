@@ -133,14 +133,14 @@ public class AppFrame extends JFrame {
     }
     
     private static Font fontResource = null;
+    private final static String FONT_NAME = "VeraMono.ttf";
 
     private void loadFontResource() {
-        String name = "VeraMono.ttf";
+        ;
         int size = (largeFont ? 16 : 12);
         
         if (fontResource == null) {
-            ClassLoader loader = AppFrame.class.getClassLoader();
-            InputStream stream = loader.getResourceAsStream(name);
+            InputStream stream = GeomBase.getResourceAsStream(FONT_NAME);
         
             if (stream != null) {
         	try {

@@ -103,9 +103,7 @@ public class Session {
     /** Load from a resource in the classpath (e.g. the prelude file) */
     protected static void loadResource(String name) 
     		throws CommandException {
-        ClassLoader loader = Session.class.getClassLoader();
-        InputStream stream = loader.getResourceAsStream(name);
-
+        InputStream stream = GeomBase.getResourceAsStream(name);
         if (stream == null)
             throw new CommandException(
         	    "Can't read resource " + name, "#noresource");

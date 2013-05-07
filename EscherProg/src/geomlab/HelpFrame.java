@@ -99,8 +99,6 @@ public class HelpFrame extends JFrame {
 	});
     }
     
-    private static ClassLoader loader = HelpFrame.class.getClassLoader();
-    
     /** History of pages visited */
     private Stack<URL> history = new Stack<URL>();
     
@@ -109,7 +107,7 @@ public class HelpFrame extends JFrame {
     
     /** Resolve a page URL given token */
     public static URL pageUrl(String page) {
-	return loader.getResource("doc/h-"+page+".html");
+	return GeomBase.getResource("doc/h-"+page+".html");
     }
     
     /** Visit the next page in the history */

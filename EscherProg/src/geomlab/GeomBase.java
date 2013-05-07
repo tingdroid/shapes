@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.URL;
 
 import funbase.Evaluator;
 import funbase.Name;
@@ -129,6 +130,20 @@ public class GeomBase {
 	}
     }
 
+    /** Global method of accessing resource streams */
+    public static InputStream getResourceAsStream(String name) {
+	ClassLoader loader = Session.class.getClassLoader();
+        InputStream stream = loader.getResourceAsStream(name);
+	return stream;
+    }    
+    
+    /** Global method of accessing resource URLs */
+    public static URL getResource(String name) {
+	ClassLoader loader = Session.class.getClassLoader();
+        URL url = loader.getResource(name);
+	return url;
+    }    
+    
     /** Load from a file */
     protected void loadFromFile(File file, boolean display) {
         File save_currentFile = currentFile;
@@ -153,21 +168,6 @@ public class GeomBase {
     }
 
     public File getCurrentFile() { return currentFile; }
-
-    /** Load from a resource in the classpath (e.g. the prelude file) */
-    protected void loadResource(String name) {
-        ClassLoader loader = this.getClass().getClassLoader();
-        InputStream stream = loader.getResourceAsStream(name);
-
-        if (stream == null) {
-            errorMessage("Can't read resource " + name, "#noresource");
-            return;
-        }
-
-        Reader reader = new BufferedReader(new InputStreamReader(stream));
-        eval_loop(reader, false, null);
-        try { reader.close(); } catch (IOException e) { }
-    }
 
     public void exit() {
 	System.exit(0);
