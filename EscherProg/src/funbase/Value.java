@@ -45,6 +45,7 @@ import funbase.Evaluator.Result;
 public abstract class Value implements Serializable {
     private static final String svnid =
 	"$Id:Value.java 319 2008-04-03 10:05:25Z mike $";
+    private static final long serialVersionUID = 1L;
     
     /* The actual classes used to represent values are those contained
      * in this file, together with the classes Closure and Primitive -- plus
