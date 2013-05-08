@@ -44,6 +44,7 @@ import funbase.Evaluator.Result;
 public abstract class Function extends Value {
     private static final String svnid =
 	"$Id:Function.java 352 2008-05-27 14:50:52Z mike $";
+    private static final long serialVersionUID = 1L;
 
     /** Name of the function: this is "<lambda>" for lambda expressions */
     protected final String name;
