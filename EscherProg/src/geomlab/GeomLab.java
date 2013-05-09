@@ -59,8 +59,6 @@ import geomlab.Command.CommandException;
  * details of how pictures are made up.
  */
 public class GeomLab extends GeomBase {
-    private static final String svnid =
-	"$Id: GeomLab.java 365 2008-06-11 17:11:29Z mike $";
 
     public final AppFrame frame = new AppFrame();
     public final GraphBox arena = new GraphBox("Picture", frame);

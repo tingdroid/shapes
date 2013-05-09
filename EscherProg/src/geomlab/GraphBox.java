@@ -60,8 +60,6 @@ import plugins.Drawable;
 
 /** A Frame for displaying a Picture object */
 public class GraphBox extends JFrame implements Printable {
-    private static final String svnid =
-	"$Id: GraphBox.java 319 2008-04-03 10:05:25Z mike $";
     
     protected Drawable picture = null;
     protected boolean antialiased = false;

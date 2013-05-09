@@ -55,8 +55,7 @@ import geomlab.GraphBox;
 
 /** A rectangular graphical object of scalable size but fixed aspect ratio */
 public class Picture extends Value implements Drawable {
-    private static final String svnid =
-	"$Id: Picture.java 367 2008-06-11 17:17:53Z mike $";
+
     private static final long serialVersionUID = 1L;
 
     private final float aspect; // = width / height

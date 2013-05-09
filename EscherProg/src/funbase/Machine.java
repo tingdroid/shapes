@@ -48,8 +48,6 @@ import funbase.Value.WrongKindException;
  *  stack.  It then yields itself as a Result, and when resumed, it 
  *  continues the execution of the code. */
 public class Machine extends Continuation implements Result {
-    private static final String svnid =
-	"$Id:Machine.java 319 2008-04-03 10:05:25Z mike $";
 
     /* Opcodes used to be an enumerated type: but (I guess) that
        entails a method call as part of any switch statement, and

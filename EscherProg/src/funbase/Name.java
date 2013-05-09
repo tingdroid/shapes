@@ -45,8 +45,6 @@ import java.util.Map;
  *  environment. */
 public class Name extends Value 
 	implements Comparable<Name>, java.io.Serializable {
-    private static final String svnid =
-	"$Id:Name.java 319 2008-04-03 10:05:25Z mike $";
     private static final long serialVersionUID = 1L;
 	
     /** The name as a string */

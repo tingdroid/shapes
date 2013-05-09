@@ -43,8 +43,6 @@ import geomlab.Command.CommandException;
  * It is also capable of bootstrapping the compiler from a text file
  * containing a dump of the object code. */
 public class RunScript extends GeomBase {
-    private static final String svnid =
-	"$Id: RunScript.java 381 2009-05-12 14:12:34Z mike $";
 
     public void evalString(String exp) {
 	StringReader reader = new StringReader(exp);

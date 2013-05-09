@@ -36,8 +36,6 @@ import java.io.Writer;
 
 /** A non-editable text area that can be opened as a PrintWriter */
 public class LogArea extends MyTextArea {
-    private static final String svnid =
-	"$Id: LogArea.java 302 2007-10-07 18:10:11Z mike $";
     
     public LogArea(int height, int width) {
 	super(height, width);

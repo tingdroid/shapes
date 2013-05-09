@@ -50,8 +50,6 @@ import javax.swing.JTextField;
 /** A command that may be appear on a menu.  Static methods of this class
  *  create the menus for the application */
 public abstract class Command extends AbstractAction {
-    private static final String svnid =
-	"$Id: Command.java 331 2008-05-06 16:05:51Z mike $";
     
     private GeomLab app;
     

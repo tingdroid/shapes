@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Scanner {
-    private static final String svnid =
-	"$Id:Scanner.java 319 2008-04-03 10:05:25Z mike $";
     
     public Token tok;
     public String sym;

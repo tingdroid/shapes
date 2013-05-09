@@ -42,8 +42,6 @@ import funbase.Scanner.Token;
  *  and raises Scanner.SyntaxError if it finds an error;  there's no
  *  support for subsequent error recovery. */
 public class Parser {
-    private static final String svnid =
-	"$Id:Parser.java 319 2008-04-03 10:05:25Z mike $";
     
     private Scanner scanner;
 

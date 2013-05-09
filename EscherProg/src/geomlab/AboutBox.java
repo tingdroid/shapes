@@ -35,8 +35,6 @@ import javax.swing.JTextArea;
 
 /** A dialog box showing the version number, credits and licence information */
 public class AboutBox {
-    private static final String svnid =
-	"$Id: AboutBox.java 331 2008-05-06 16:05:51Z mike $";
 
     /** Command -- show the about box */
     public static void aboutBox(GeomLab app) {

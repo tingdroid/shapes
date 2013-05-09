@@ -43,8 +43,6 @@ import funbase.Evaluator.Result;
 
 /** A value that represents a primitive function like 'sqrt' or '+'. */
 public abstract class Primitive extends Function {
-    private static final String svnid =
-	"$Id:Primitive.java 319 2008-04-03 10:05:25Z mike $";
     
     /** Context of latest invocation */
     public transient ErrContext cxt;

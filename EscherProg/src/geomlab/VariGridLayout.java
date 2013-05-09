@@ -43,8 +43,6 @@ import java.awt.Insets;
  * with (thankfully) a simple interface.
  */
 public class VariGridLayout extends GridBagLayout {
-    private static final String svnid =
-	"$Id: VariGridLayout.java 174 2006-04-07 15:06:23Z mike $";
     
     private int ncols;
     private int row = 0, col = 0;

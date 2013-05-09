@@ -6,10 +6,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 public class PhoneHome {
-    private static final String svnid =
-	"$Id";
-    
-    private static final String home =
+
+	private static final String home =
 	"http://spivey.oriel.ox.ac.uk/mike/geomlab-home/version.txt";
     
     private String result = null;

@@ -38,8 +38,6 @@ import javax.swing.JFileChooser;
 /** A JFileChooser that remembers the directory between instances, and
  *  can filter by a default extension */
 class MyFileChooser extends JFileChooser {
-    private static final String svnid =
-	"$Id: MyFileChooser.java 202 2006-08-12 08:42:42Z mike $";
 
     /** Default extension for selected files */
     private String ext;

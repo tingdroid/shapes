@@ -38,8 +38,6 @@ import javax.swing.JTextArea;
 
 /** Like JTextArea, but implements antialiasing */
 public class MyTextArea extends JTextArea {
-    private static final String svnid =
-	"$Id: MyTextArea.java 174 2006-04-07 15:06:23Z mike $";
     
     private boolean antialiased = false;
     

@@ -46,8 +46,6 @@ import plugins.Vec2D;
 
 /** Painting context for drawing on the screen */
 public class ScreenTablet extends Tablet {
-    private static final String svnid =
-	"$Id: ScreenTablet.java 372 2008-10-06 22:49:30Z mike $";
 
     private Graphics2D gcxt;
     private Stack<Graphics2D> saved = new Stack<Graphics2D>();

@@ -45,8 +45,6 @@ import geomlab.Image;
 
 /** Picture context that outputs Encapsulated PostScript */
 public class EPSWrite extends Tablet {
-    private static final String svnid =
-	"$Id: EPSWrite.java 365 2008-06-11 17:11:29Z mike $";
 
     private PrintWriter pr;
 

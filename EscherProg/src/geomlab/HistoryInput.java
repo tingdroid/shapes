@@ -56,8 +56,6 @@ import javax.swing.text.View;
  * when the user presses Enter.  The commands that have been executed
  * are also recorded as a history. */
 public class HistoryInput extends MyTextArea {
-    private static final String svnid =
-	"$Id: HistoryInput.java 306 2007-11-14 00:27:45Z mike $";
     
     protected java.util.List<String> history = new ArrayList<String>();
     protected int index;

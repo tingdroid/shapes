@@ -37,10 +37,7 @@ import funbase.Machine.ByteCode;
 /** This class provides the context for evaluating paragraphs: it imposes
  *  a time limit, and provides the final continuations that are invoked
  *  when evaluation is complete. */
-public class Evaluator {
-    private static final String svnid =
-	"$Id:Evaluator.java 319 2008-04-03 10:05:25Z mike $";
-    
+public class Evaluator {    
     private final Value phrase;
     private final String text;
     private final boolean display;
