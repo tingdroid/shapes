@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.URL;
 
 import funbase.Evaluator;
 import funbase.Name;
@@ -50,245 +51,264 @@ import funbase.Value;
 /** Common superclass for classes that provide a read-eval-print loop */
 public class GeomBase {
 
-    protected boolean statsFlag = false;
-    protected Value last_val = null;
-    protected String errtag = "";
-    protected int status = 0;
-    protected PrintWriter log;
-    private File currentFile = null;
+	protected boolean statsFlag = false;
+	protected Value last_val = null;
+	protected String errtag = "";
+	protected int status = 0;
+	protected PrintWriter log;
+	private File currentFile = null;
 
-    public void setLog(PrintWriter log) {
-        this.log = log;
-    }
-
-    public void logWrite(String s) {
-	log.println(s);
-	log.flush();
-    }
-
-    public void logMessage(String msg) {
-	logWrite("[" + msg + "]");
-    }
-
-    public void errorMessage(String msg, String errtag) {
-	logMessage(msg);
-	if (status < 1) status = 1;
-	this.errtag = errtag;
-    }
-
-    public void evalError(String prefix, String message, String errtag) {
-	log.print(prefix); log.println(message); log.flush();
-	if (status < 2) status = 2;
-	this.errtag = errtag;
-    }
- 
-    protected boolean eval_loop(Reader reader, boolean display,
-	    AppFrame errframe) {
-	Parser parser = new Parser(reader);
-	errtag = "";
-
-	while (true) {
-	    try {
-		Value p = parser.parsePara();
-		if (p == null) return true; // End of input
-
-		last_val = null;
-
-		Evaluator ev = 
-		    new Evaluator(p, parser.getText(), display, log);
-
-		try {
-		    last_val = ev.execute();
-		}
-		catch (Evaluator.EvalException e) {
-		    evalError("Aargh: ", e.getMessage(), e.getErrtag());
-		    return false;
-		}
-		catch (Throwable e) {
-		    evalError("Failure: ", e.toString(), "#failure");
-		    return false;
-		}
-		finally {
-		    if (display) {
-			if (statsFlag) ev.printStats(log);
-			log.flush();
-		    }
-		}
-	    }
-	    catch (Scanner.SyntaxException e) {
-		if (errframe == null)
-		    evalError("Oops: ", e.toString(), e.getErrtag());
-		else {
-		    evalError("Oops: ", e.shortMessage(), e.getErrtag());
-		    errframe.showError(e.getStart(), e.getEnd());
-		}
-		return false;
-	    }
+	public void setLog(PrintWriter log) {
+		this.log = log;
 	}
-    }
 
-    /** Load from a file */
-    protected void loadFromFile(File file, boolean display) {
-        File save_currentFile = currentFile;
-        try {
-            Reader reader = new BufferedReader(new FileReader(file));
-            currentFile = file;
-            eval_loop(reader, display, null);
-            logMessage("Loaded " + file.getName());
-            try { reader.close(); } catch (IOException e) { }
-        }
-        catch (FileNotFoundException e) {
-            errorMessage("Can't read " + file.getName(), "#nofile");
-        }
-        finally {
-            currentFile = save_currentFile;
-        }
-    }
+	public void logWrite(String s) {
+		log.println(s);
+		log.flush();
+	}
 
-    protected void loadFromStream(InputStream in) {
-	Reader reader = new InputStreamReader(in);
-	eval_loop(reader, false, null);
-    }
+	public void logMessage(String msg) {
+		logWrite("[" + msg + "]");
+	}
 
-    public File getCurrentFile() { return currentFile; }
+	public void errorMessage(String msg, String errtag) {
+		logMessage(msg);
+		if (status < 1)
+			status = 1;
+		this.errtag = errtag;
+	}
 
-    /** Load from a resource in the classpath (e.g. the prelude file) */
-    protected void loadResource(String name) {
-        ClassLoader loader = this.getClass().getClassLoader();
-        InputStream stream = loader.getResourceAsStream(name);
+	public void evalError(String prefix, String message, String errtag) {
+		log.print(prefix);
+		log.println(message);
+		log.flush();
+		if (status < 2)
+			status = 2;
+		this.errtag = errtag;
+	}
 
-        if (stream == null) {
-            errorMessage("Can't read resource " + name, "#noresource");
-            return;
-        }
+	protected boolean eval_loop(Reader reader, boolean display,
+			AppFrame errframe) {
+		Parser parser = new Parser(reader);
+		errtag = "";
 
-        Reader reader = new BufferedReader(new InputStreamReader(stream));
-        eval_loop(reader, false, null);
-        try { reader.close(); } catch (IOException e) { }
-    }
+		while (true) {
+			try {
+				Value p = parser.parsePara();
+				if (p == null)
+					return true; // End of input
 
-    public void exit() {
-	System.exit(0);
-    }
+				last_val = null;
 
-    public boolean getStatsFlag() {
-        return statsFlag;
-    }
+				Evaluator ev = new Evaluator(p, parser.getText(), display, log);
 
-    public void setStatsFlag(boolean statsFlag) {
-        this.statsFlag = statsFlag;
-    }
+				try {
+					last_val = ev.execute();
+				} catch (Evaluator.EvalException e) {
+					evalError("Aargh: ", e.getMessage(), e.getErrtag());
+					return false;
+				} catch (Throwable e) {
+					evalError("Failure: ", e.toString(), "#failure");
+					return false;
+				} finally {
+					if (display) {
+						if (statsFlag)
+							ev.printStats(log);
+						log.flush();
+					}
+				}
+			} catch (Scanner.SyntaxException e) {
+				if (errframe == null)
+					evalError("Oops: ", e.toString(), e.getErrtag());
+				else {
+					evalError("Oops: ", e.shortMessage(), e.getErrtag());
+					errframe.showError(e.getStart(), e.getEnd());
+				}
+				return false;
+			}
+		}
+	}
 
-    public String getErrtag() { return errtag; }
+	/** Load from a file */
+	protected void loadFromFile(File file, boolean display) {
+		File save_currentFile = currentFile;
+		try {
+			Reader reader = new BufferedReader(new FileReader(file));
+			currentFile = file;
+			eval_loop(reader, display, null);
+			logMessage("Loaded " + file.getName());
+			try {
+				reader.close();
+			} catch (IOException e) {
+			}
+		} catch (FileNotFoundException e) {
+			errorMessage("Can't read " + file.getName(), "#nofile");
+		} finally {
+			currentFile = save_currentFile;
+		}
+	}
 
-    public int getStatus() { return status; }
+	protected void loadFromStream(InputStream in) {
+		Reader reader = new InputStreamReader(in);
+		eval_loop(reader, false, null);
+	}
 
-    protected static GeomBase theApp;
+	public File getCurrentFile() {
+		return currentFile;
+	}
 
-    public static void registerApp(GeomBase app) {
-	theApp = app;
-    }
+	/** Load from a resource in the classpath (e.g. the prelude file) */
+	protected void loadResource(String name) {
+		InputStream stream = getResourceAsStream(name);
 
-    public static final Primitive primitives[] = {
-        /* A few system-oriented primitives */
-        new Primitive("primitive", 1) {
-            /* Look up a primitive */
-            public Value invoke(Value args[], int base) {
-        	return Primitive.find(cxt.string(args[base+0]));
-            }
-        },
+		if (stream == null) {
+			errorMessage("Can't read resource " + name, "#noresource");
+			return;
+		}
 
-        new Primitive("install", 1) {
-            /* Install a plug-in class with primitives. */
-            public Value invoke(Value args[], int base) {
-        	String name = cxt.string(args[base+0]);
-        	try {
-        	    Class<?> plugin;
-        	    try {
-        		plugin = Class.forName("plugins." + name);
-        	    }
-        	    catch (ClassNotFoundException e) {
-        		plugin = Class.forName(name);
-        	    }
-        	
-        	    Session.installPlugin(plugin);
-        	}
-        	catch (Exception e) {
-        	    cxt.primFail("install failure for " + name
-        		    + " - " + e.getMessage(), "#install");
-        	}
-        	return Value.nil;
-            }
-        },
+		Reader reader = new BufferedReader(new InputStreamReader(stream));
+		eval_loop(reader, false, null);
+		try {
+			reader.close();
+		} catch (IOException e) {
+		}
+	}
 
-        new Primitive("freeze", 0) {
-            public Value invoke(Value args[], int base) {
-        	Name.freezeGlobals();
-        	return Value.nil;
-            }
-        },
+	/** Global method of accessing resource streams */
+	public static InputStream getResourceAsStream(String name) {
+		ClassLoader loader = Session.class.getClassLoader();
+		InputStream stream = loader.getResourceAsStream(name);
+		return stream;
+	}
 
-        new Primitive("error", 2) {
-            public Value invoke(Value args[], int base) {
-        	cxt.primFail(cxt.string(args[base+0]), 
-        		cxt.string(args[base+1]));
-        	return null;
-            }
-        },
+	/** Global method of accessing resource URLs */
+	public static URL getResource(String name) {
+		ClassLoader loader = Session.class.getClassLoader();
+		URL url = loader.getResource(name);
+		return url;
+	}
 
-        new Primitive("opdef", 2) {
-            public Value invoke(Value args[], int base) {
-        	Scanner.addOperator(
-        		cxt.string(args[base+0]), cxt.string(args[base+1]));
-        	return Value.nil;
-            }
-        },
+	public void exit() {
+		System.exit(0);
+	}
 
-        new Primitive("load", 1) {
-            public Value invoke(Value args[], int base) {
-        	String name = cxt.string(args[base+0]);
-        	File current = theApp.getCurrentFile();
-        	File file = (current == null ? new File(name)
-        		: new File(current.getParentFile(), name));
-        	theApp.loadFromFile(file, false);
-        	return Value.nil;
-            }
-        },
+	public boolean getStatsFlag() {
+		return statsFlag;
+	}
 
-        new Primitive("limit", 3) {
-           public Value invoke(Value args[], int base) {
-               Evaluator.setLimits((int) cxt.number(args[base+0]),
-        	       (int) cxt.number(args[base+1]), 
-        	       (int) cxt.number(args[base+2]));
-               return Value.nil;
-           }
-        },
+	public void setStatsFlag(boolean statsFlag) {
+		this.statsFlag = statsFlag;
+	}
 
-        new Primitive("quit", 0) {
-            public Value invoke(Value args[], int base) {
-        	theApp.exit();
-        	return Value.nil;
-            }
-        },
-        
-        new Primitive("dump", 1) {
-            public Value invoke(Value args[], int base) {
-        	try {
-        	    Session.saveSession(new File(cxt.string(args[base+0])));
-        	    return Value.nil;
-        	}
-        	catch (Command.CommandException e) {
-        	    throw new Evaluator.EvalException(e.toString(), 
-        		    cxt, "#nohelp");
-        	}
-            }
-        },
-        
-        new Primitive("xdump", 0) {
-            public Value invoke(Value args[], int base) {
-        	Name.dumpNames();
-        	return Value.nil;
-            }
-        }
-    };
+	public String getErrtag() {
+		return errtag;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	protected static GeomBase theApp;
+
+	public static void registerApp(GeomBase app) {
+		theApp = app;
+	}
+
+	public static final Primitive primitives[] = {
+	/* A few system-oriented primitives */
+	new Primitive("primitive", 1) {
+		/* Look up a primitive */
+		public Value invoke(Value args[], int base) {
+			return Primitive.find(cxt.string(args[base + 0]));
+		}
+	},
+
+	new Primitive("install", 1) {
+		/* Install a plug-in class with primitives. */
+		public Value invoke(Value args[], int base) {
+			String name = cxt.string(args[base + 0]);
+			try {
+				Class<?> plugin;
+				try {
+					plugin = Class.forName("plugins." + name);
+				} catch (ClassNotFoundException e) {
+					plugin = Class.forName(name);
+				}
+
+				Session.installPlugin(plugin);
+			} catch (Exception e) {
+				cxt.primFail(
+						"install failure for " + name + " - " + e.getMessage(),
+						"#install");
+			}
+			return Value.nil;
+		}
+	},
+
+	new Primitive("freeze", 0) {
+		public Value invoke(Value args[], int base) {
+			Name.freezeGlobals();
+			return Value.nil;
+		}
+	},
+
+	new Primitive("error", 2) {
+		public Value invoke(Value args[], int base) {
+			cxt.primFail(cxt.string(args[base + 0]), cxt.string(args[base + 1]));
+			return null;
+		}
+	},
+
+	new Primitive("opdef", 2) {
+		public Value invoke(Value args[], int base) {
+			Scanner.addOperator(cxt.string(args[base + 0]),
+					cxt.string(args[base + 1]));
+			return Value.nil;
+		}
+	},
+
+	new Primitive("load", 1) {
+		public Value invoke(Value args[], int base) {
+			String name = cxt.string(args[base + 0]);
+			File current = theApp.getCurrentFile();
+			File file = (current == null ? new File(name) : new File(
+					current.getParentFile(), name));
+			theApp.loadFromFile(file, false);
+			return Value.nil;
+		}
+	},
+
+	new Primitive("limit", 3) {
+		public Value invoke(Value args[], int base) {
+			Evaluator.setLimits((int) cxt.number(args[base + 0]),
+					(int) cxt.number(args[base + 1]),
+					(int) cxt.number(args[base + 2]));
+			return Value.nil;
+		}
+	},
+
+	new Primitive("quit", 0) {
+		public Value invoke(Value args[], int base) {
+			theApp.exit();
+			return Value.nil;
+		}
+	},
+
+	new Primitive("dump", 1) {
+		public Value invoke(Value args[], int base) {
+			try {
+				Session.saveSession(new File(cxt.string(args[base + 0])));
+				return Value.nil;
+			} catch (Command.CommandException e) {
+				throw new Evaluator.EvalException(e.toString(), cxt, "#nohelp");
+			}
+		}
+	},
+
+	new Primitive("xdump", 0) {
+		public Value invoke(Value args[], int base) {
+			Name.dumpNames();
+			return Value.nil;
+		}
+	} };
 }
